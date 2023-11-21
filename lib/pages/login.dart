@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:poolpack_picking/Model/login_data.dart';
 import 'package:poolpack_picking/Pages/home.dart';
 import 'package:poolpack_picking/Pages/impostazioni.dart';
@@ -25,12 +26,28 @@ class LoginDemoState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   List<String> utenti = [];
   String? utenteSelezionato;
+  Map<dynamic, dynamic> _packageUpdateUrl = {};
 
   @override
   void initState() {
     super.initState();
+    initPlatformState();
     //setIp();
     getUtenti();
+  }
+
+  Future<void> initPlatformState() async {
+    Map<dynamic, dynamic> updateUrl;
+    try {
+      updateUrl = await AutoUpdate.fetchGithub("nspiri", "poolpack_picking");
+    } on PlatformException {
+      updateUrl = {'assetUrl': 'Failed to get the url of the new release.'};
+    }
+    if (!mounted) return;
+
+    setState(() {
+      _packageUpdateUrl = updateUrl;
+    });
   }
 
   void validaCampi() {
@@ -82,21 +99,27 @@ class LoginDemoState extends State<Login> {
 
           break;
         case "401":
+          isLoading = false;
+          setState(() {});
           showErrorMessage(context, "Utente o password errati");
           break;
         case "403":
+          isLoading = false;
+          setState(() {});
           showErrorMessage(context, "Utente non attivo");
           break;
         case "404":
+          isLoading = false;
+          setState(() {});
           showErrorMessage(context,
               "La risorsa chiamata ha impiegato troppo tempo per rispondere");
           break;
         default:
+          isLoading = false;
+          setState(() {});
           showErrorMessage(context, "Si è verificato un errore");
           break;
       }
-      isLoading = false;
-      setState(() {});
     });
   }
 

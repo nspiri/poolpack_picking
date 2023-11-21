@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:poolpack_picking/Model/magazzino.dart';
 import 'package:poolpack_picking/Model/ordini_fornitori.dart';
 import 'package:poolpack_picking/utils/global.dart';
 import 'package:poolpack_picking/utils/http.dart';
@@ -120,34 +121,25 @@ class PickingPageState extends State<PickingPage> {
 
       if (value != null) {
         widget.documento?.articoli?[widget.index].picking = value;
-        if (controlloOrdineCompleto(documento!)) {
-          if (!controlloOrdiniCompletati(widget.listaDocumenti)) {
-            apriDialogConfermaOrdineCompletato(context, widget.listaDocumenti,
-                documento!, widget.tornaIndietro);
-          } else {
-            apriDialogOrdiniCompletati(context);
-          }
-        } else {
-          if (articolo.picking != null) {
-            var completo = true;
-            if (documento != null) {
-              if (documento!.articoli != null) {
-                for (int c = 0; c < documento!.articoli!.length; c++) {
-                  if (documento?.articoli?[c].picking == null) {
-                    completo = false;
-                  }
+        if (articolo.picking != null) {
+          var completo = true;
+          if (documento != null) {
+            if (documento!.articoli != null) {
+              for (int c = 0; c < documento!.articoli!.length; c++) {
+                if (documento?.articoli?[c].picking == null) {
+                  completo = false;
                 }
               }
             }
-            if (!completo) {
-              if (documento!.articoli!.length > 1) {
-                apriDialogConferma(
-                    context, documento!, widget.index, articolo, setArticolo);
-                _focusNode.unfocus();
-              }
-            } else {
-              Navigator.pop(context);
+          }
+          if (!completo) {
+            if (documento!.articoli!.length > 1) {
+              apriDialogConferma(
+                  context, documento!, widget.index, articolo, setArticolo);
+              _focusNode.unfocus();
             }
+          } else {
+            Navigator.pop(context);
           }
         }
       } else {
@@ -435,11 +427,17 @@ class PickingPageState extends State<PickingPage> {
                           isLoading = true;
                           setState(() {});
                           http
-                              .getArticoliArt(codiceArticolo.text)
+                              .getArticoliArt(codiceArticolo.text, 0)
                               .then((value) {
                             isLoading = false;
                             if (value.isNotEmpty) {
-                              articoloRicerca = value[0];
+                              for (var element in value) {
+                                if (element.codiceArticolo ==
+                                    articolo.codiceArticolo) {
+                                  articoloRicerca = element;
+                                  break;
+                                }
+                              }
                             } else {
                               articoloRicerca = null;
                             }
@@ -618,7 +616,8 @@ class PickingPageState extends State<PickingPage> {
               enabled: isQtaEnabled && isEnabled,
               onChanged: (value) {
                 if (value.endsWith(",")) {
-                  value = value.replaceRange(value.length - 1, value.length, ".");
+                  value =
+                      value.replaceRange(value.length - 1, value.length, ".");
                   qta.text = value;
                 }
                 if (!widget.isOF) {
@@ -640,7 +639,9 @@ class PickingPageState extends State<PickingPage> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
-                DecimalTextInputFormatter(decimalRange: articolo.decimali!)
+                DecimalTextInputFormatter(
+                    decimalRange:
+                        articolo.decimali! == 0 ? 2 : articolo.decimali!)
               ],
             ),
           ),
@@ -691,7 +692,9 @@ class PickingPageState extends State<PickingPage> {
             if (isEnabled) {
               if (isQtaEnabled) {
                 if (quantita - 1 >= 0) {
-                  quantita = quantita - 1;
+                  if (quantita.truncateToDouble() == quantita) {
+                    quantita = quantita - 1;
+                  }
                   qta.text = formatStringDecimal(
                       quantita.floorToDouble(), articolo.decimali!);
                   setState(() {});

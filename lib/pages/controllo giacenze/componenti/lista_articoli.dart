@@ -82,6 +82,28 @@ class ListaArticoliGState extends State<ListaArticoliG> {
     return 0;
   }
 
+  aggiornaArticoli() {
+    isLoading = true;
+    setState(() {});
+    if (isCercaArticolo) {
+      http.getArticoliArt(codiceSelezionato, 0).then((value) {
+        isLoading = false;
+        articoli = value;
+        codice.text = "";
+        setState(() {});
+      });
+    } else {
+      http
+          .getArticoliUbi(cercaIdUbicazione(codiceSelezionato) ?? 0)
+          .then((value) {
+        isLoading = false;
+        articoli = value;
+        codice.text = "";
+        setState(() {});
+      });
+    }
+  }
+
   void apriListaUbicazioni() {
     Navigator.of(context)
         .push(FullScreenSearchModal(
@@ -97,7 +119,7 @@ class ListaArticoliGState extends State<ListaArticoliG> {
           isLoading = false;
           articoli = val;
           codiceSelezionato = value.codice!;
-          codice.text = "";
+          //codice.text = "";
           controlloArticoli(articoli);
           setState(() {});
         });
@@ -111,7 +133,7 @@ class ListaArticoliGState extends State<ListaArticoliG> {
         isLoading = true;
         setState(() {});
         http
-            .getArticoliArt((value as ArticoloLista).codiceArticolo ?? "")
+            .getArticoliArt((value as ArticoloLista).codiceArticolo ?? "", 0)
             .then((val) {
           isLoading = false;
           articoli = val;
@@ -151,9 +173,10 @@ class ListaArticoliGState extends State<ListaArticoliG> {
                           isLoading = true;
                           setState(() {});
                           if (isCercaArticolo) {
-                            http.getArticoliArt(codice.text).then((value) {
+                            http.getArticoliArt(codice.text, 0).then((value) {
                               isLoading = false;
                               articoli = value;
+                              codiceSelezionato = codice.text;
                               codice.text = "";
                               controlloArticoli(articoli);
                               setState(() {});
@@ -232,7 +255,10 @@ class ListaArticoliGState extends State<ListaArticoliG> {
                         controlloOrdineCompleto: () {},
                         listaDocumenti: null,
                         setDocumento: (DocumentoOF doc) {}))
-                .then((value) => null);
+                .then((value) {
+              aggiornaArticoli();
+            });
+            articoli = [];
           },
           onLongPress: () {
             //chiediConfermaResiduoSospeso(articolo, index);

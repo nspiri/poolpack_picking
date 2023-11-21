@@ -375,7 +375,7 @@ class Http {
     }
   }
 
-  Future<List<Articolo>> getArticoliArt(String codArt) async {
+  Future<List<Articolo>> getArticoliArt(String codArt, int prTaglia) async {
     try {
       final Request request = Request(
           cmd: 'esec_collage_server_remoto',
@@ -394,6 +394,15 @@ class Http {
         if (parsedListJson != null) {
           articoli = List<Articolo>.from(
               parsedListJson.map((i) => Articolo.fromJson(i)));
+        }
+        if (prTaglia != 0) {
+          if (articoli.length > 1) {
+            for (var c = 0; c < articoli.length; c++) {
+              if (articoli[c].prgTaglia == prTaglia) {
+                return [articoli[c]];
+              }
+            }
+          }
         }
         return articoli;
       } else {

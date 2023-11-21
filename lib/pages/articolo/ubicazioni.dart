@@ -215,7 +215,9 @@ class UbicazioniPageState extends State<UbicazioniPage> {
           if (doc != null) {
             showSuccessMessage(context,
                 "Documento ${doc.documento} ${doc.serie}/${doc.numero} creato");
-            http.getArticoliArt(articolo.codiceArticolo!).then((value) {
+            http
+                .getArticoliArt(articolo.codiceArticolo!, articolo.prgTaglia!)
+                .then((value) {
               isLoading = false;
               articolo = value[0];
               //articolo.picking = tempPicking;

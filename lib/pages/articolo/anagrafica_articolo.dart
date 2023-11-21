@@ -162,7 +162,9 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
             var tempPicking = articolo.picking;
             var tempColli = articolo.colli;
             var tempQta = articolo.quantita;
-            http.getArticoliArt(articolo.codiceArticolo!).then((value) {
+            http
+                .getArticoliArt(articolo.codiceArticolo!, articolo.prgTaglia!)
+                .then((value) {
               isLoading = false;
               articolo = value[0];
               articolo.picking = tempPicking;
@@ -239,7 +241,10 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
               if (doc != null) {
                 showSuccessMessage(context,
                     "Documento ${doc.documento} ${doc.serie}/${doc.numero} creato");
-                http.getArticoliArt(articolo.codiceArticolo!).then((value) {
+                http
+                    .getArticoliArt(
+                        articolo.codiceArticolo!, articolo.prgTaglia!)
+                    .then((value) {
                   isLoading = false;
                   articolo = value[0];
                   widget.dati.articolo = value[0];

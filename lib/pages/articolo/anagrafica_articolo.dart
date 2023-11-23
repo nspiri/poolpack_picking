@@ -33,6 +33,7 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
   ScrollController scrollController = ScrollController();
   bool isTrasferisci = true;
   GlobalKey<UbicazioniPageState> globalKey = GlobalKey();
+  GlobalKey<PickingPageState> globalKeyPicking = GlobalKey();
 
   @override
   void initState() {
@@ -81,8 +82,7 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
   }
 
   cambiaArticolo(int index) {
-    articolo = documento!.articoli![index];
-    this.index = index;
+    articolo = widget.dati.listaArticoli[index];
     var scrollPosition = scrollController.position;
     scrollController.animateTo(scrollPosition.minScrollExtent,
         duration: const Duration(milliseconds: 500), curve: Curves.ease);
@@ -279,11 +279,12 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
 
   setArticolo(int i) {
     articolo = documento!.articoli![i];
+    widget.dati.articolo = documento!.articoli![i];
     cambiaArticolo(i);
     setState(() {});
   }
 
-  setPicking(
+  /* setPicking(
       Articolo articolo, int colli, String? quantita, String stato, int index) {
     isLoading = true;
     setState(() {});
@@ -305,18 +306,22 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
 
     http.setPickingOrdini(payload, context).then((value) {
       isLoading = false;
-
+      setState(() {});
       if (value != null) {
-        documento?.articoli?[index].picking = value;
+        articolo.picking = value;
+        //documento?.articoli?[index].picking = value;
+        setState(() {});
         if (controlloOrdineCompleto(documento!)) {
-          if (!controlloOrdiniCompletati(widget.dati.listaDocumenti!)) {
-            apriDialogConfermaOrdineCompletato(
-                context,
-                widget.dati.listaDocumenti!,
-                widget.dati.documentoOF!,
-                tornaListaArticoli);
-          } else {
-            apriDialogOrdiniCompletati(context);
+          if (documento?.documento == "OC") {
+            if (!controlloOrdiniCompletati(widget.dati.listaDocumenti!)) {
+              apriDialogConfermaOrdineCompletato(
+                  context,
+                  widget.dati.listaDocumenti!,
+                  widget.dati.documentoOF!,
+                  tornaListaArticoli);
+            } else {
+              apriDialogOrdiniCompletati(context);
+            }
           }
         } else {
           if (articolo.picking != null) {
@@ -330,14 +335,14 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
                 }
               }
             }
-            if (!completo) {
-              if (documento!.articoli!.length > 1) {
-                apriDialogConferma(context, widget.dati.documentoOF!, index,
-                    articolo, setArticolo);
-              }
-            } else {
-              Navigator.pop(context);
+            //if (!completo) {
+            if (documento!.articoli!.length > 1) {
+              apriDialogConferma(
+                  context, documento!, index, articolo, setArticolo);
             }
+            //} else {
+            //  Navigator.pop(context);
+            //}
           }
         }
       } else {
@@ -345,7 +350,7 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
       }
       setState(() {});
     });
-  }
+  }*/
 
   apriConfermaArticoloSospeso(Articolo articolo, int index) {
     showDialog<bool>(
@@ -363,12 +368,13 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
           TextButton(
             child: const Text('Si'),
             onPressed: () {
-              if (articolo.picking != null) {
+              globalKeyPicking.currentState!.confermaQuantita("#");
+              /*if (articolo.picking != null) {
                 setPicking(articolo, articolo.picking!.colli!,
                     articolo.picking!.quantita!.toString(), "#", index);
               } else {
                 setPicking(articolo, 0, "0", "#", index);
-              }
+              }*/
 
               Navigator.pop(c, false);
             },
@@ -436,16 +442,18 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
                   Visibility(
                     visible: modalita == "OF" || modalita == "OC",
                     child: PickingPage(
+                      key: globalKeyPicking,
                       articolo: articolo,
                       documento: documento,
                       index: index,
                       controlloOrdineCompleto:
                           widget.dati.controlloOrdineCompleto!,
-                      cambiaArticolo: cambiaArticolo,
+                      cambiaArticolo: setArticolo,
                       listaDocumenti: widget.dati.listaDocumenti ?? [],
                       tornaIndietro: tornaListaArticoli,
                       isOF: modalita == "OF" ? true : false,
                       setScrollDown: setScrollDown,
+                      listaArticoli: widget.dati.listaArticoli,
                     ),
                   ),
                   UbicazioniPage(

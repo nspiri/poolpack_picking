@@ -93,10 +93,7 @@ controlloOrdineCompleto(DocumentoOF documento) {
     Articolo art = documento.articoli![c];
     if (art.picking != null) {
       if (art.picking!.stato != " ") {
-        if (art.picking!.stato == "<" || art.picking!.stato == ">") {
-        } else {
-          numeroArticoliCompleti += 1;
-        }
+        numeroArticoliCompleti += 1;
       }
     }
   }
@@ -128,19 +125,28 @@ controlloOrdineCompleto(DocumentoOF documento) {
 }*/
 
 int trovaArticoloSuccessivo(DocumentoOF doc, int index, Articolo articolo) {
+  int primoRosso = 0;
+  bool fatto = false;
   for (int c = 0; c < doc.articoli!.length; c++) {
     if (doc.articoli![c].rigo == articolo.rigo) {
       if (!(c + 1 >= doc.articoli!.length)) {
         var num = c + 1;
-        for (var i = num; i < doc.articoli!.length; i++) {
-          if (doc.articoli![num].picking == null) {
+        for (var i = 0; i < doc.articoli!.length; i++) {
+          if (doc.articoli![i].picking == null) {
             return i;
+          } else {
+            if (doc.articoli![i].picking!.stato != "=") {
+              if (!fatto) {
+                primoRosso = i;
+                fatto = true;
+              }
+            }
           }
         }
       }
     }
   }
-  return 0;
+  return primoRosso;
 }
 
 trovaOrdineSuccessivo(List<DocumentoOF> lista, DocumentoOF documento) {
@@ -160,8 +166,45 @@ trovaOrdineSuccessivo(List<DocumentoOF> lista, DocumentoOF documento) {
   return 0;
 }
 
-apriDialogConferma(BuildContext context, DocumentoOF documento, int inde,
-    Articolo articolo, Function(int index) setArticolo) {
+int articoloSuccessivo(int index, List<Articolo> articoli, Articolo articolo) {
+  int primoRosso = 0;
+  bool fatto = false;
+  for (var c = index + 1; c < articoli.length; c++) {
+    if (articoli[c].picking == null) {
+      return c;
+    } else {
+      if (articoli[c].picking!.stato != "=" &&
+          articoli[c].picking!.stato != "#") {
+        if (!fatto) {
+          primoRosso = c;
+          fatto = true;
+        }
+      }
+    }
+  }
+  for (var c = 0; c < index; c++) {
+    if (articoli[c].picking == null) {
+      return c;
+    } else {
+      if (articoli[c].picking!.stato != "=" &&
+          articoli[c].picking!.stato != "#") {
+        if (!fatto) {
+          primoRosso = c;
+          fatto = true;
+        }
+      }
+    }
+  }
+  return primoRosso;
+}
+
+apriDialogConferma(
+    BuildContext context,
+    DocumentoOF documento,
+    int inde,
+    Articolo articolo,
+    Function(int index) setArticolo,
+    List<Articolo> listaArticoli) {
   showDialog<bool>(
     context: context,
     builder: (c) => AlertDialog(
@@ -170,21 +213,24 @@ apriDialogConferma(BuildContext context, DocumentoOF documento, int inde,
         TextButton(
           child: const Text('No'),
           onPressed: () {
-            //isShowing = false;
             Navigator.pop(c, false);
           },
         ),
         TextButton(
           child: const Text('Si'),
           onPressed: () {
-            int index = trovaArticoloSuccessivo(documento, inde, articolo);
-            setArticolo(index);
             Navigator.pop(c, true);
           },
         ),
       ],
     ),
-  );
+  ).then((value) {
+    if (value == true) {
+      //int index = trovaArticoloSuccessivo(documento, inde, articolo);
+      int index = articoloSuccessivo(inde, listaArticoli, articolo);
+      setArticolo(index);
+    }
+  });
 }
 
 apriDialogConfermaOrdineCompletato(

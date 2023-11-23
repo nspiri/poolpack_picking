@@ -11,6 +11,7 @@ class PickingPage extends StatefulWidget {
   final int index;
   final DocumentoOF? documento;
   final List<DocumentoOF> listaDocumenti;
+  final List<Articolo> listaArticoli;
   final bool isOF;
   final Function() controlloOrdineCompleto;
   final Function(int index) cambiaArticolo;
@@ -26,7 +27,8 @@ class PickingPage extends StatefulWidget {
       required this.listaDocumenti,
       required this.tornaIndietro,
       required this.isOF,
-      required this.setScrollDown});
+      required this.setScrollDown,
+      required this.listaArticoli});
 
   @override
   PickingPageState createState() => PickingPageState();
@@ -62,16 +64,38 @@ class PickingPageState extends State<PickingPage> {
   }
 
   setArticolo(int i) {
-    int index = trovaArticoloSuccessivo(documento!, i, articolo);
-    articolo = documento!.articoli![index];
     codiceArticolo.text = "";
-    qta.text = "0";
-    colli.text =
-        articolo.picking != null ? articolo.picking!.colli.toString() : "0";
-    setCampi();
+    //articolo = documento!.articoli![i];
+    articolo = widget.listaArticoli[i];
+    widget.cambiaArticolo(i);
     isEnabled = false;
+    isQtaEnabled = false;
+    setCampiCambio();
+    _focusNode.requestFocus();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    setState(() {});
+  }
 
-    widget.cambiaArticolo(index);
+  setCampiCambio() {
+    if (articolo.colli != 0) {
+      if (articolo.picking != null) {
+        colli.text = articolo.picking!.colli.toString();
+        qta.text = formatStringDecimal(
+            articolo.picking!.quantita!, articolo.decimali!);
+      } else {
+        colli.text = articolo.colli.toString();
+        qta.text = formatStringDecimal(
+            articolo.colli! * articolo.quantita!, articolo.decimali!);
+      }
+    } else {
+      isQtaEnabled = true;
+      if (articolo.picking != null) {
+        qta.text = formatStringDecimal(
+            articolo.picking!.quantita!, articolo.decimali!);
+      } else {
+        qta.text = formatStringDecimal(0, articolo.decimali!);
+      }
+    }
   }
 
   setCampi() {
@@ -99,7 +123,11 @@ class PickingPageState extends State<PickingPage> {
     setState(() {});
   }
 
-  salvaPicking() {
+  confermaQuantita(String stato) {
+    salvaPicking(stato);
+  }
+
+  salvaPicking(String stato) {
     isLoading = true;
     setState(() {});
     Picking data = Picking(
@@ -113,39 +141,49 @@ class PickingPageState extends State<PickingPage> {
             articolo.colli == 0 ? double.parse(qta.text) : articolo.quantita,
         idMagazzino: articolo.idMagazzino,
         idUbicazione: articolo.idUbicazione,
-        stato: "",
+        stato: stato,
         idUtente: utente_selezionato!.nome.toString());
 
     http.setPickingOrdini(data, context).then((value) {
       isLoading = false;
 
       if (value != null) {
-        widget.documento?.articoli?[widget.index].picking = value;
-        if (articolo.picking != null) {
-          var completo = true;
-          if (documento != null) {
-            if (documento!.articoli != null) {
-              for (int c = 0; c < documento!.articoli!.length; c++) {
-                if (documento?.articoli?[c].picking == null) {
-                  completo = false;
+        //widget.documento?.articoli?[widget.index].picking = value;
+        articolo.picking = value;
+        setState(() {});
+        if (controlloOrdineCompleto(documento!)) {
+          if (!controlloOrdiniCompletati(widget.listaDocumenti)) {
+            apriDialogConfermaOrdineCompletato(context, widget.listaDocumenti,
+                widget.documento!, widget.tornaIndietro);
+          } else {
+            apriDialogOrdiniCompletati(context);
+          }
+        } else {
+          if (articolo.picking != null) {
+            var completo = true;
+            if (documento != null) {
+              if (documento!.articoli != null) {
+                for (int c = 0; c < documento!.articoli!.length; c++) {
+                  if (documento?.articoli?[c].picking == null) {
+                    completo = false;
+                  }
                 }
               }
             }
-          }
-          if (!completo) {
+            //  if (!completo) {
             if (documento!.articoli!.length > 1) {
-              apriDialogConferma(
-                  context, documento!, widget.index, articolo, setArticolo);
+              apriDialogConferma(context, documento!, widget.index, articolo,
+                  setArticolo, widget.listaArticoli);
               _focusNode.unfocus();
             }
-          } else {
-            Navigator.pop(context);
+            // } else {
+            //Navigator.pop(context);
+            // }
           }
         }
       } else {
         showErrorMessage(context, "Si è verificato un errore");
       }
-      setState(() {});
     });
   }
 
@@ -279,6 +317,8 @@ class PickingPageState extends State<PickingPage> {
 
   @override
   Widget build(BuildContext context) {
+    articolo = widget.articolo;
+    documento = widget.documento;
     return picking();
   }
 
@@ -507,7 +547,7 @@ class PickingPageState extends State<PickingPage> {
                     button("Salva", () {
                       if (!widget.isOF) {
                         if (quantitaPicking <= articolo.esistenzaUbicazione!) {
-                          salvaPicking();
+                          salvaPicking("");
                         } else {
                           showErrorMessage(context,
                               "L'esistenza non è sufficente a soddisfare la richiesta del documento");
@@ -524,7 +564,7 @@ class PickingPageState extends State<PickingPage> {
                           }
                         }
                       } else {
-                        salvaPicking();
+                        salvaPicking("");
                       }
                       setState(() {});
                     })

@@ -186,7 +186,10 @@ class ListaArticoliState extends State<ListaArticoli> {
                         index: index,
                         controlloOrdineCompleto: widget.controlloOrdineCompleto,
                         listaDocumenti: widget.listaDocumenti,
-                        setDocumento: setDocumento))
+                        setDocumento: setDocumento,
+                        listaArticoli: widget.isOF
+                            ? widget.documento!.articoli!
+                            : widget.articoli!))
                 .then((value) => refresh());
           },
           onLongPress: () {

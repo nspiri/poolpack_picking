@@ -62,6 +62,7 @@ class PassaggioDatiArticolo {
   List<DocumentoOF>? listaDocumenti;
   String modalita;
   int? index;
+  List<Articolo> listaArticoli;
   final Function()? controlloOrdineCompleto;
   final Function(DocumentoOF doc)? setDocumento;
 
@@ -71,6 +72,7 @@ class PassaggioDatiArticolo {
       required this.documentoOF,
       required this.index,
       required this.controlloOrdineCompleto,
+      required this.listaArticoli,
       required this.listaDocumenti,
       required this.setDocumento});
 }

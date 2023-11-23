@@ -15,7 +15,7 @@ import '../Model/login_data.dart';
 import '../env.dart' as env;
 
 class Http {
-  Duration get loginTime => const Duration(milliseconds: 0);
+  Duration get loginTime => const Duration(milliseconds: 30);
 
   Future<List<String>> getUtenti(BuildContext context) async {
     try {
@@ -31,7 +31,7 @@ class Http {
         final response = await http
             .post(Uri.parse('$base_url/webapi/servizi'),
                 headers: env.passHeaders, body: jsonEncode(request))
-            .timeout(const Duration(seconds: 10));
+            .timeout(loginTime);
         if (response.statusCode == 200) {
           Map<String, dynamic> res = jsonDecode(response.body);
           List<dynamic> parsedListJson = res["result"];
@@ -65,7 +65,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         utente_selezionato = Utente.fromJson(res["result"][0]);
@@ -91,7 +91,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? parsedListJson = res["result"];
@@ -122,7 +122,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<Magazzino> magazzini = [];
@@ -155,7 +155,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<Ubicazione> ubicazioni = [];
@@ -187,7 +187,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<ArticoloLista> ubicazioni = [];
@@ -215,10 +215,11 @@ class Http {
           nomeCollage: 'colsrpic',
           etichettaCollage: 'SET_PICKING',
           dati: data);
+      var d = jsonEncode(request);
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Picking picking;
         Map<String, dynamic> res = jsonDecode(response.body);
@@ -252,7 +253,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? result = res["result"];
@@ -282,7 +283,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? result = res["result"];
@@ -321,7 +322,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? result = res["result"];
@@ -356,7 +357,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? result = res["result"];
@@ -386,7 +387,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? parsedListJson = res["result"];
@@ -426,7 +427,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? parsedListJson = res["result"];
@@ -457,7 +458,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? parsedListJson = res["result"];
@@ -487,7 +488,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? parsedListJson = res["result"];
@@ -523,7 +524,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Map<String, dynamic> res = jsonDecode(response.body);
         List<dynamic>? result = res["result"];
@@ -562,7 +563,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 10));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Documento doc;
         Map<String, dynamic> res = jsonDecode(response.body);
@@ -605,7 +606,7 @@ class Http {
       final response = await http
           .post(Uri.parse('${env.base_url}/webapi/servizi'),
               headers: env.passHeaders, body: jsonEncode(request))
-          .timeout(const Duration(seconds: 30));
+          .timeout(loginTime);
       if (response.statusCode == 200) {
         Documento doc;
         Map<String, dynamic> res = jsonDecode(response.body);

@@ -40,7 +40,8 @@ class ListaArticoliGState extends State<ListaArticoliG> {
               index: 0,
               controlloOrdineCompleto: () {},
               listaDocumenti: null,
-              setDocumento: (DocumentoOF a) {}));
+              setDocumento: (DocumentoOF a) {},
+              listaArticoli: articoli));
       this.articoli = [];
     }
     setState(() {});
@@ -254,7 +255,8 @@ class ListaArticoliGState extends State<ListaArticoliG> {
                         index: index,
                         controlloOrdineCompleto: () {},
                         listaDocumenti: null,
-                        setDocumento: (DocumentoOF doc) {}))
+                        setDocumento: (DocumentoOF doc) {},
+                        listaArticoli: articoli))
                 .then((value) {
               aggiornaArticoli();
             });

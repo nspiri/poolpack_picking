@@ -54,6 +54,34 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
     return false;
   }
 
+  String controlloOrdineCompleto2(DocumentoOF documento) {
+    int sospesi = 0;
+    int pickingNull = 0;
+
+    for (int c = 0; c < documento.articoli!.length; c++) {
+      Articolo art = documento.articoli![c];
+      if (art.picking != null) {
+        if (art.picking!.stato != " ") {
+          if (art.picking!.stato != "=" || art.picking!.stato == "#") {
+            sospesi++;
+          }
+        } else {
+          pickingNull++;
+        }
+      } else {
+        pickingNull++;
+      }
+    }
+
+    if (pickingNull > 0) {
+      return "P";
+    }
+    if (sospesi > 0) {
+      return "S";
+    }
+    return "Y";
+  }
+
   controlloOrdiniCompletati() {
     for (int c = 0; c < widget.ordine.ordini.length; c++) {
       if (controlloOrdineCompleto(widget.ordine.ordini[c]) == false) {
@@ -222,11 +250,18 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
             visible: widget.ordine.isOF,
             child: IconButton(
                 onPressed: () {
-                  if (controlloOrdineCompleto(ordine)) {
-                    apriDialogDatiBF(ordine, context, evadiOrdine);
-                  } else {
-                    showErrorMessage(
-                        context, "Completa l'ordine prima di poterlo inviare");
+                  switch (controlloOrdineCompleto2(ordine)) {
+                    case "P":
+                      showErrorMessage(context,
+                          "Completa l'ordine prima di poterlo confermare");
+                      break;
+                    case "S":
+                      showErrorMessage(
+                          context, "Ordine con quantità da confermare");
+                      break;
+                    case "Y":
+                      apriDialogDatiBF(ordine, context, evadiOrdine);
+                      break;
                   }
                 },
                 icon: const Icon(Icons.send)),

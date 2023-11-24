@@ -264,6 +264,25 @@ apriDialogConfermaOrdineCompletato(
   );
 }
 
+apriDialogConfermaOrdineCompletatoOF(
+    BuildContext context, Function() tornaIndietro) {
+  showDialog<bool>(
+    context: context,
+    builder: (c) => AlertDialog(
+      title: const Text('Ordine completato.'),
+      actions: [
+        TextButton(
+          child: const Text('Ok'),
+          onPressed: () {
+            tornaIndietro();
+            Navigator.pop(c, false);
+          },
+        ),
+      ],
+    ),
+  );
+}
+
 apriDialogOrdiniCompletati(BuildContext context) {
   showDialog<bool>(
     context: context,

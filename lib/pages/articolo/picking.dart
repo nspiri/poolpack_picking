@@ -62,6 +62,10 @@ class PickingPageState extends State<PickingPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.articoloPicking != null) {
         controlloArticolo(widget.articoloPicking);
+      } else {
+        if (widget.isOF) {
+          controlloArticolo(widget.articolo);
+        }
       }
     });
   }
@@ -193,7 +197,12 @@ class PickingPageState extends State<PickingPage> {
         } else {
           setArticolo(widget.index);
           _focusNode.unfocus();
-          Navigator.pop(context);
+          if (controlloOrdineCompleto(documento!)) {
+            apriDialogConfermaOrdineCompletatoOF(
+                context, () => Navigator.pop(context));
+          } else {
+            Navigator.pop(context);
+          }
         }
       } else {
         showErrorMessage(context, "Si è verificato un errore");

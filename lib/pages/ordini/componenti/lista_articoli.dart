@@ -193,7 +193,8 @@ class ListaArticoliState extends State<ListaArticoli> {
                   if (value.isNotEmpty) {
                     for (var element in widget.articoli!) {
                       var c = widget.articoli!.indexOf(element);
-                      if (element.codiceArticolo == value[0].codiceArticolo) {
+                      if (element.codiceArticolo == value[0].codiceArticolo &&
+                          element.prgTaglia == value[0].prgTaglia) {
                         if (value.length > 1) {
                           _scrollController.animateTo(
                               double.parse((200 * c).toString()),
@@ -205,7 +206,9 @@ class ListaArticoliState extends State<ListaArticoli> {
                           int cont = 0;
                           for (var i = 0; i < widget.articoli!.length; i++) {
                             if (widget.articoli![i].codiceArticolo ==
-                                value[0].codiceArticolo) {
+                                    value[0].codiceArticolo &&
+                                widget.articoli![i].prgTaglia ==
+                                    value[0].prgTaglia) {
                               cont++;
                             }
                           }
@@ -245,10 +248,10 @@ class ListaArticoliState extends State<ListaArticoli> {
                     /*if (controlloOrdineCompleto(widget.documento!)) {
                       showSuccessMessage(context, "Documento completato");
                     }*/
-                    /*if (!trovato) {
+                    if (!trovato) {
                       showErrorMessage(
                           context, "Articolo non presente in lista");
-                    }*/
+                    }
                   } else {
                     showErrorMessage(context, "Codice articolo non trovato");
                   }

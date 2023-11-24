@@ -41,7 +41,8 @@ class ListaArticoliGState extends State<ListaArticoliG> {
               controlloOrdineCompleto: () {},
               listaDocumenti: null,
               setDocumento: (DocumentoOF a) {},
-              listaArticoli: articoli));
+              listaArticoli: articoli,
+              articoloPicking: null));
       this.articoli = [];
     }
     setState(() {});
@@ -256,7 +257,8 @@ class ListaArticoliGState extends State<ListaArticoliG> {
                         controlloOrdineCompleto: () {},
                         listaDocumenti: null,
                         setDocumento: (DocumentoOF doc) {},
-                        listaArticoli: articoli))
+                        listaArticoli: articoli,
+                        articoloPicking: null))
                 .then((value) {
               aggiornaArticoli();
             });

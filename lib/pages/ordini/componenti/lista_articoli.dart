@@ -16,6 +16,7 @@ class ListaArticoli extends StatefulWidget {
   final bool isOF;
   final Function() controlloOrdineCompleto;
   final Function(DocumentoOF doc) setDocumento;
+  final Function(bool val) setLoading;
   const ListaArticoli(
       {super.key,
       required this.articoli,
@@ -24,7 +25,8 @@ class ListaArticoli extends StatefulWidget {
       required this.documento,
       required this.listaDocumenti,
       required this.setDocumento,
-      required this.isOF});
+      required this.isOF,
+      required this.setLoading});
 
   @override
   ListaArticoliState createState() => ListaArticoliState();
@@ -34,9 +36,14 @@ class ListaArticoliState extends State<ListaArticoli> {
   Http http = Http();
   bool isLoading = false;
   bool isShowing = false;
+  TextEditingController codiceArticolo = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+  final _scrollController = ScrollController();
 
   refresh() {
-    widget.controlloOrdineCompleto();
+    if (!widget.isOF) {
+      widget.controlloOrdineCompleto();
+    }
     setState(() {});
   }
 
@@ -147,7 +154,9 @@ class ListaArticoliState extends State<ListaArticoli> {
           widget.listaDocumenti[idDocumento(articolo)!].articoli?[index]
               .picking = value;
         }
-        widget.controlloOrdineCompleto();
+        if (!widget.isOF) {
+          widget.controlloOrdineCompleto();
+        }
       } else {
         showErrorMessage(context, "Si è verificato un errore");
       }
@@ -157,11 +166,110 @@ class ListaArticoliState extends State<ListaArticoli> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: widget.articoli?.length,
-      itemBuilder: (context, index) {
-        return cardArticolo(widget.articoli![index], index);
-      },
+    return Column(
+      children: [
+        Visibility(
+          visible: widget.isOF,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
+            child: TextField(
+              focusNode: _focusNode,
+              autofocus: true,
+              controller: codiceArticolo,
+              onTap: () => codiceArticolo.selection = TextSelection(
+                  baseOffset: 0,
+                  extentOffset: codiceArticolo.value.text.length),
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black,
+              ),
+              decoration: const InputDecoration(
+                  border: OutlineInputBorder(), labelText: "Codice"),
+              onSubmitted: (value) {
+                widget.setLoading(true);
+                http.getArticoliArt(codiceArticolo.text, 0).then((value) {
+                  widget.setLoading(false);
+                  var trovato = false;
+                  if (value.isNotEmpty) {
+                    for (var element in widget.articoli!) {
+                      var c = widget.articoli!.indexOf(element);
+                      if (element.codiceArticolo == value[0].codiceArticolo) {
+                        if (value.length > 1) {
+                          _scrollController.animateTo(
+                              double.parse((200 * c).toString()),
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeIn);
+                          trovato = true;
+                          break;
+                        } else {
+                          int cont = 0;
+                          for (var i = 0; i < widget.articoli!.length; i++) {
+                            if (widget.articoli![i].codiceArticolo ==
+                                value[0].codiceArticolo) {
+                              cont++;
+                            }
+                          }
+                          if (cont > 1) {
+                            _scrollController.animateTo(
+                                double.parse((200 * c).toString()),
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeIn);
+                            trovato = true;
+                            break;
+                          } else {
+                            if (!trovato) {
+                              trovato = true;
+                              Navigator.pushNamed(
+                                      context,
+                                      AnagraficaArticolo
+                                          .route, //PAGINA LISTA ARTICOLI DA DOCUMENTI
+                                      arguments: PassaggioDatiArticolo(
+                                          articolo: widget.articoli![c],
+                                          modalita: widget.isOF ? "OF" : "OC",
+                                          documentoOF: widget.documento,
+                                          index: 0,
+                                          controlloOrdineCompleto:
+                                              widget.controlloOrdineCompleto,
+                                          listaDocumenti: widget.listaDocumenti,
+                                          setDocumento: setDocumento,
+                                          listaArticoli: widget.isOF
+                                              ? widget.documento!.articoli!
+                                              : widget.articoli!,
+                                          articoloPicking: value[0]))
+                                  .then((value) => refresh());
+                            }
+                          }
+                        }
+                      }
+                    }
+                    /*if (controlloOrdineCompleto(widget.documento!)) {
+                      showSuccessMessage(context, "Documento completato");
+                    }*/
+                    /*if (!trovato) {
+                      showErrorMessage(
+                          context, "Articolo non presente in lista");
+                    }*/
+                  } else {
+                    showErrorMessage(context, "Codice articolo non trovato");
+                  }
+                  codiceArticolo.text = "";
+                  setState(() {});
+                });
+              },
+              onEditingComplete: () {},
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            controller: _scrollController,
+            itemCount: widget.articoli?.length,
+            itemBuilder: (context, index) {
+              return cardArticolo(widget.articoli![index], index);
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -189,7 +297,8 @@ class ListaArticoliState extends State<ListaArticoli> {
                         setDocumento: setDocumento,
                         listaArticoli: widget.isOF
                             ? widget.documento!.articoli!
-                            : widget.articoli!))
+                            : widget.articoli!,
+                        articoloPicking: null))
                 .then((value) => refresh());
           },
           onLongPress: () {

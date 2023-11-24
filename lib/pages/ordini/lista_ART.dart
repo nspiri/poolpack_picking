@@ -68,6 +68,11 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
     setState(() {});
   }
 
+  setLoading(bool val) {
+    isLoading = val;
+    setState(() {});
+  }
+
   apriDialogConferma() {
     showDialog<bool>(
       context: context,
@@ -246,6 +251,7 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
             },
             setDocumento: setOrdine,
             isOF: widget.ordine.isOF,
+            setLoading: setLoading,
           ),
           loading()
         ],

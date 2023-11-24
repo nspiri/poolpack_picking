@@ -13,6 +13,7 @@ class PickingPage extends StatefulWidget {
   final List<DocumentoOF> listaDocumenti;
   final List<Articolo> listaArticoli;
   final bool isOF;
+  final Articolo? articoloPicking;
   final Function() controlloOrdineCompleto;
   final Function(int index) cambiaArticolo;
   final Function(DocumentoOF documento) tornaIndietro;
@@ -28,7 +29,8 @@ class PickingPage extends StatefulWidget {
       required this.tornaIndietro,
       required this.isOF,
       required this.setScrollDown,
-      required this.listaArticoli});
+      required this.listaArticoli,
+      required this.articoloPicking});
 
   @override
   PickingPageState createState() => PickingPageState();
@@ -57,6 +59,11 @@ class PickingPageState extends State<PickingPage> {
     documento = widget.documento;
     colli.text = "0";
     setCampi();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.articoloPicking != null) {
+        controlloArticolo(widget.articoloPicking);
+      }
+    });
   }
 
   refresh() {
@@ -151,35 +158,42 @@ class PickingPageState extends State<PickingPage> {
         //widget.documento?.articoli?[widget.index].picking = value;
         articolo.picking = value;
         setState(() {});
-        if (controlloOrdineCompleto(documento!)) {
-          if (!controlloOrdiniCompletati(widget.listaDocumenti)) {
-            apriDialogConfermaOrdineCompletato(context, widget.listaDocumenti,
-                widget.documento!, widget.tornaIndietro);
+        if (!widget.isOF) {
+          if (controlloOrdineCompleto(documento!)) {
+            if (!controlloOrdiniCompletati(widget.listaDocumenti)) {
+              if (!widget.isOF) {
+                apriDialogConfermaOrdineCompletato(
+                    context,
+                    widget.listaDocumenti,
+                    widget.documento!,
+                    widget.tornaIndietro);
+              }
+            } else {
+              apriDialogOrdiniCompletati(context);
+            }
           } else {
-            apriDialogOrdiniCompletati(context);
-          }
-        } else {
-          if (articolo.picking != null) {
-            var completo = true;
-            if (documento != null) {
-              if (documento!.articoli != null) {
-                for (int c = 0; c < documento!.articoli!.length; c++) {
-                  if (documento?.articoli?[c].picking == null) {
-                    completo = false;
+            if (articolo.picking != null) {
+              var completo = true;
+              if (documento != null) {
+                if (documento!.articoli != null) {
+                  for (int c = 0; c < documento!.articoli!.length; c++) {
+                    if (documento?.articoli?[c].picking == null) {
+                      completo = false;
+                    }
                   }
                 }
               }
+              if (documento!.articoli!.length > 1) {
+                apriDialogConferma(context, documento!, widget.index, articolo,
+                    setArticolo, widget.listaArticoli);
+                _focusNode.unfocus();
+              }
             }
-            //  if (!completo) {
-            if (documento!.articoli!.length > 1) {
-              apriDialogConferma(context, documento!, widget.index, articolo,
-                  setArticolo, widget.listaArticoli);
-              _focusNode.unfocus();
-            }
-            // } else {
-            //Navigator.pop(context);
-            // }
           }
+        } else {
+          setArticolo(widget.index);
+          _focusNode.unfocus();
+          Navigator.pop(context);
         }
       } else {
         showErrorMessage(context, "Si è verificato un errore");
@@ -442,49 +456,54 @@ class PickingPageState extends State<PickingPage> {
                   childrenPadding: const EdgeInsets.only(bottom: 8),
                   expandedCrossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
-                      child: TextField(
-                        focusNode: _focusNode,
-                        autofocus: true,
-                        controller: codiceArticolo,
-                        onTap: () => codiceArticolo.selection = TextSelection(
-                            baseOffset: 0,
-                            extentOffset: codiceArticolo.value.text.length),
-                        /* onTap: () {
-                          tastiera = TextInputType.text;
-                          _focusNode.requestFocus();
-                          setState(() {});
-                        },*/
-                        //keyboardType: tastiera,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                        decoration: const InputDecoration(
-                            border: OutlineInputBorder(), labelText: "Codice"),
-                        onEditingComplete: () {
-                          isLoading = true;
-                          setState(() {});
-                          http
-                              .getArticoliArt(codiceArticolo.text, 0)
-                              .then((value) {
-                            isLoading = false;
-                            if (value.isNotEmpty) {
-                              for (var element in value) {
-                                if (element.codiceArticolo ==
-                                    articolo.codiceArticolo) {
-                                  articoloRicerca = element;
-                                  break;
-                                }
-                              }
-                            } else {
-                              articoloRicerca = null;
-                            }
-                            controlloArticolo(articoloRicerca);
+                    Visibility(
+                      //visible: widget.articoloPicking == null,
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.only(top: 8, left: 8, right: 8),
+                        child: TextField(
+                          focusNode: _focusNode,
+                          autofocus: true,
+                          controller: codiceArticolo,
+                          onTap: () => codiceArticolo.selection = TextSelection(
+                              baseOffset: 0,
+                              extentOffset: codiceArticolo.value.text.length),
+                          /* onTap: () {
+                            tastiera = TextInputType.text;
+                            _focusNode.requestFocus();
                             setState(() {});
-                          });
-                        },
+                          },*/
+                          //keyboardType: tastiera,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                          ),
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: "Codice"),
+                          onEditingComplete: () {
+                            isLoading = true;
+                            setState(() {});
+                            http
+                                .getArticoliArt(codiceArticolo.text, 0)
+                                .then((value) {
+                              isLoading = false;
+                              if (value.isNotEmpty) {
+                                for (var element in value) {
+                                  if (element.codiceArticolo ==
+                                      articolo.codiceArticolo) {
+                                    articoloRicerca = element;
+                                    break;
+                                  }
+                                }
+                              } else {
+                                articoloRicerca = null;
+                              }
+                              controlloArticolo(articoloRicerca);
+                              setState(() {});
+                            });
+                          },
+                        ),
                       ),
                     ),
                     Padding(

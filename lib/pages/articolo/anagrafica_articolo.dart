@@ -454,6 +454,7 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
                       isOF: modalita == "OF" ? true : false,
                       setScrollDown: setScrollDown,
                       listaArticoli: widget.dati.listaArticoli,
+                      articoloPicking: widget.dati.articoloPicking,
                     ),
                   ),
                   UbicazioniPage(

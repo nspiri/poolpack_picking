@@ -81,6 +81,11 @@ class ListaOCState extends State<ListaOC> {
     });
   }
 
+  setLoading(bool val) {
+    isLoading = val;
+    setState(() {});
+  }
+
   getListaArticoliFromDocumenti() {
     articoli = [];
     for (var c = 0; c < documenti.length; c++) {
@@ -220,6 +225,7 @@ class ListaOCState extends State<ListaOC> {
                     },
                     setDocumento: (DocumentoOF d) {},
                     isOF: false,
+                    setLoading: setLoading,
                   ),
                 ),
               ),

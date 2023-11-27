@@ -9,6 +9,7 @@ import 'package:poolpack_picking/pages/vendite/componenti/lista_vendite.dart';
 import 'package:poolpack_picking/utils/dropdown.dart';
 import 'package:poolpack_picking/utils/http.dart';
 import 'package:poolpack_picking/utils/utils.dart';
+import 'package:dartbag/collection.dart';
 
 class ListaOC extends StatefulWidget {
   static const route = "/listaordiniclienti";
@@ -75,7 +76,7 @@ class ListaOCState extends State<ListaOC> {
     setState(() {});
     http.getVendite(zona!).then((value) {
       isLoading = false;
-      documenti = value;
+      documenti = ordinaDocumenti(value);
       getListaArticoliFromDocumenti();
       setState(() {});
     });
@@ -84,6 +85,27 @@ class ListaOCState extends State<ListaOC> {
   setLoading(bool val) {
     isLoading = val;
     setState(() {});
+  }
+
+  ordinaDocumenti(List<DocumentoOF> docs) {
+    for (var c = 0; c < docs.length; c++) {
+      docs[c].articoli?.sort((a, b) {
+        int percorso = b.percorso!.compareTo(a.percorso!);
+        int codArt = b.codiceArticolo!.compareTo(a.codiceArticolo!);
+        int prTaglia = b.prgTaglia!.compareTo(a.prgTaglia!);
+        if (percorso == 0) {
+          if (codArt == 0) {
+            return -prTaglia;
+          }
+          return -codArt;
+        }
+        if (codArt == 0) {
+          return -prTaglia;
+        }
+        return -percorso;
+      });
+    }
+    return docs;
   }
 
   getListaArticoliFromDocumenti() {
@@ -96,7 +118,19 @@ class ListaOCState extends State<ListaOC> {
       articoli.addAll(documenti[c].articoli!);
     }
     articoli.sort((a, b) {
-      return a.percorso!.compareTo(b.percorso!);
+      int percorso = b.percorso!.compareTo(a.percorso!);
+      int codArt = b.codiceArticolo!.compareTo(a.codiceArticolo!);
+      int prTaglia = b.prgTaglia!.compareTo(a.prgTaglia!);
+      if (percorso == 0) {
+        if (codArt == 0) {
+          return -prTaglia;
+        }
+        return -codArt;
+      }
+      if (codArt == 0) {
+        return -prTaglia;
+      }
+      return -percorso;
     });
   }
 
@@ -106,7 +140,6 @@ class ListaOCState extends State<ListaOC> {
   }
 
   apriDialogEvadiDocumenti() {
-    Http http = Http();
     showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
@@ -151,8 +184,6 @@ class ListaOCState extends State<ListaOC> {
         showSuccessMessage(context, "Ordini cliente evasi");
       }
       aggiornaDocumenti();
-      isLoading = false;
-      setState(() {});
     });
   }
 
@@ -215,18 +246,18 @@ class ListaOCState extends State<ListaOC> {
                 visible: !isOC,
                 child: Expanded(
                   child: ListaArticoli(
-                    articoli: articoli, //
-                    visualizzaDatiOrdine: false,
-                    documento: null, //
-                    listaDocumenti: documenti,
-                    controlloOrdineCompleto: () {
-                      articoli = [];
-                      getDocumenti(zonaSelezionata!.id!);
-                    },
-                    setDocumento: (DocumentoOF d) {},
-                    isOF: false,
-                    setLoading: setLoading,
-                  ),
+                      articoli: articoli, //
+                      visualizzaDatiOrdine: false,
+                      documento: null, //
+                      listaDocumenti: documenti,
+                      controlloOrdineCompleto: () {
+                        articoli = [];
+                        getDocumenti(zonaSelezionata!.id!);
+                      },
+                      setDocumento: (DocumentoOF d) {},
+                      isOF: false,
+                      setLoading: setLoading,
+                      isUbicazione: true),
                 ),
               ),
             ],
@@ -316,7 +347,7 @@ class ListaOCState extends State<ListaOC> {
                                 children: [
                                   Text(
                                     value.descrizione!,
-                                    style: TextStyle(fontSize: 12),
+                                    style: const TextStyle(fontSize: 12),
                                   ),
                                   Text(
                                     value.documenti.toString(),
@@ -330,7 +361,7 @@ class ListaOCState extends State<ListaOC> {
                           selectedItemBuilder: zone.map<Widget>((Zona item) {
                             return Text(
                               item.descrizione!,
-                              style: TextStyle(fontSize: 12),
+                              style: const TextStyle(fontSize: 12),
                             );
                           }).toList(),
                           value: zonaSelezionata,

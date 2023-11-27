@@ -33,16 +33,21 @@ class ListaArticoliGState extends State<ListaArticoliG> {
   controlloArticoli(List<Articolo> articoli) {
     if (articoli.length == 1) {
       Navigator.pushNamed(context, AnagraficaArticolo.route,
-          arguments: PassaggioDatiArticolo(
-              articolo: articoli[0],
-              modalita: "CG",
-              documentoOF: null,
-              index: 0,
-              controlloOrdineCompleto: () {},
-              listaDocumenti: null,
-              setDocumento: (DocumentoOF a) {},
-              listaArticoli: articoli,
-              articoloPicking: null));
+              arguments: PassaggioDatiArticolo(
+                  articolo: articoli[0],
+                  modalita: "CG",
+                  documentoOF: null,
+                  index: 0,
+                  controlloOrdineCompleto: () {},
+                  listaDocumenti: null,
+                  setDocumento: (DocumentoOF a) {},
+                  listaArticoli: articoli,
+                  articoloPicking: null,
+                  isUbicazione: false))
+          .then((value) {
+        aggiornaArticoli();
+      });
+
       this.articoli = [];
     }
     setState(() {});
@@ -258,7 +263,8 @@ class ListaArticoliGState extends State<ListaArticoliG> {
                         listaDocumenti: null,
                         setDocumento: (DocumentoOF doc) {},
                         listaArticoli: articoli,
-                        articoloPicking: null))
+                        articoloPicking: null,
+                        isUbicazione: false))
                 .then((value) {
               aggiornaArticoli();
             });

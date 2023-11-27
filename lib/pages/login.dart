@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:poolpack_picking/Model/login_data.dart';
 import 'package:poolpack_picking/Pages/home.dart';
 import 'package:poolpack_picking/Pages/impostazioni.dart';
+import 'package:poolpack_picking/main.dart';
 import 'package:poolpack_picking/utils/dropdown.dart';
 import 'package:poolpack_picking/utils/global.dart';
 import 'package:poolpack_picking/utils/http.dart';
@@ -130,7 +131,10 @@ class LoginDemoState extends State<Login> {
       body: Stack(children: [
         const Align(
           alignment: Alignment.bottomRight,
-          child: Text('Versione: 06/10/2023 - 1.0 beta'),
+          child: Text(
+            'Versione: 06/10/2023 - 1.0 beta',
+            style: TextStyle(color: Colors.white),
+          ),
         ),
         Center(
           child: SingleChildScrollView(
@@ -182,7 +186,7 @@ class LoginDemoState extends State<Login> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
+                padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
                 child: Container(
                   height: 50,
                   width: double.infinity,
@@ -197,6 +201,10 @@ class LoginDemoState extends State<Login> {
                     ),
                   ),
                 ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text('© 2023 DATA SISTEMI All Rights Reserved'),
               ),
             ]),
           ),

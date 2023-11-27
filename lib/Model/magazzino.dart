@@ -64,6 +64,7 @@ class PassaggioDatiArticolo {
   int? index;
   List<Articolo> listaArticoli;
   Articolo? articoloPicking;
+  bool? isUbicazione;
   final Function()? controlloOrdineCompleto;
   final Function(DocumentoOF doc)? setDocumento;
 
@@ -76,7 +77,8 @@ class PassaggioDatiArticolo {
       required this.listaArticoli,
       required this.listaDocumenti,
       required this.setDocumento,
-      required this.articoloPicking});
+      required this.articoloPicking,
+      required this.isUbicazione});
 }
 
 class ArticoloLista {

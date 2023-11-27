@@ -83,6 +83,7 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
 
   cambiaArticolo(int index) {
     articolo = widget.dati.listaArticoli[index];
+    documento = widget.dati.documentoOF ?? cercaDocumento();
     var scrollPosition = scrollController.position;
     scrollController.animateTo(scrollPosition.minScrollExtent,
         duration: const Duration(milliseconds: 500), curve: Curves.ease);
@@ -278,8 +279,10 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
   }
 
   setArticolo(int i) {
-    articolo = documento!.articoli![i];
-    widget.dati.articolo = documento!.articoli![i];
+    articolo = widget.dati.listaArticoli[i];
+    //articolo = documento!.articoli![i];
+    //widget.dati.articolo = documento!.articoli![i];
+    widget.dati.articolo = widget.dati.listaArticoli[i];
     cambiaArticolo(i);
     setState(() {});
   }
@@ -455,6 +458,7 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
                       setScrollDown: setScrollDown,
                       listaArticoli: widget.dati.listaArticoli,
                       articoloPicking: widget.dati.articoloPicking,
+                      isUbicazione: widget.dati.isUbicazione,
                     ),
                   ),
                   UbicazioniPage(

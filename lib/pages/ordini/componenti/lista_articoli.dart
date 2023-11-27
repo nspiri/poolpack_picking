@@ -17,6 +17,7 @@ class ListaArticoli extends StatefulWidget {
   final Function() controlloOrdineCompleto;
   final Function(DocumentoOF doc) setDocumento;
   final Function(bool val) setLoading;
+  final bool? isUbicazione;
   const ListaArticoli(
       {super.key,
       required this.articoli,
@@ -26,7 +27,8 @@ class ListaArticoli extends StatefulWidget {
       required this.listaDocumenti,
       required this.setDocumento,
       required this.isOF,
-      required this.setLoading});
+      required this.setLoading,
+      required this.isUbicazione});
 
   @override
   ListaArticoliState createState() => ListaArticoliState();
@@ -104,8 +106,8 @@ class ListaArticoliState extends State<ListaArticoli> {
 
   DocumentoOF? cercaDocumento(Articolo articolo) {
     DocumentoOF? d;
-    for (var c = 0; c < widget.listaDocumenti!.length; c++) {
-      var doc = widget.listaDocumenti![c];
+    for (var c = 0; c < widget.listaDocumenti.length; c++) {
+      var doc = widget.listaDocumenti[c];
       if (articolo.documento == "${doc.documento} ${doc.serie}/${doc.numero}") {
         d = doc;
       }
@@ -151,8 +153,9 @@ class ListaArticoliState extends State<ListaArticoli> {
         if (widget.documento != null) {
           widget.documento?.articoli?[index].picking = value;
         } else {
-          widget.listaDocumenti[idDocumento(articolo)!].articoli?[index]
-              .picking = value;
+          widget.articoli![index].picking = value;
+          /*widget.listaDocumenti[idDocumento(articolo)!].articoli?[index]
+              .picking = value;*/
         }
         if (!widget.isOF) {
           widget.controlloOrdineCompleto();
@@ -194,21 +197,13 @@ class ListaArticoliState extends State<ListaArticoli> {
                     for (var element in widget.articoli!) {
                       var c = widget.articoli!.indexOf(element);
                       if (element.codiceArticolo == value[0].codiceArticolo &&
-                          element.prgTaglia == value[0].prgTaglia) {
+                          (element.prgTaglia == value[0].prgTaglia ||
+                              value.length > 1)) {
                         if (value.length > 1) {
-                          _scrollController.animateTo(
-                              double.parse((200 * c).toString()),
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeIn);
-                          trovato = true;
-                          break;
-                        } else {
                           int cont = 0;
                           for (var i = 0; i < widget.articoli!.length; i++) {
                             if (widget.articoli![i].codiceArticolo ==
-                                    value[0].codiceArticolo &&
-                                widget.articoli![i].prgTaglia ==
-                                    value[0].prgTaglia) {
+                                value[0].codiceArticolo) {
                               cont++;
                             }
                           }
@@ -217,6 +212,8 @@ class ListaArticoliState extends State<ListaArticoli> {
                                 double.parse((200 * c).toString()),
                                 duration: const Duration(milliseconds: 300),
                                 curve: Curves.easeIn);
+                            showSuccessMessage(
+                                context, "Seleziona l'articolo dalla lista");
                             trovato = true;
                             break;
                           } else {
@@ -238,8 +235,90 @@ class ListaArticoliState extends State<ListaArticoli> {
                                           listaArticoli: widget.isOF
                                               ? widget.documento!.articoli!
                                               : widget.articoli!,
-                                          articoloPicking: value[0]))
+                                          articoloPicking: value[0],
+                                          isUbicazione: false))
                                   .then((value) => refresh());
+                            }
+                          }
+                        } else {
+                          int cont = 0;
+                          for (var i = 0; i < widget.articoli!.length; i++) {
+                            if (widget.articoli![i].codiceArticolo ==
+                                    value[0].codiceArticolo &&
+                                widget.articoli![i].prgTaglia ==
+                                    value[0].prgTaglia) {
+                              if (value[0].alias != null &&
+                                  value[0].alias?.quantita != 0) {
+                                if (value[0].alias!.quantita ==
+                                    widget.articoli![i].confezione) {
+                                  cont++;
+                                }
+                              } else {
+                                cont++;
+                              }
+                            }
+                          }
+                          if (cont > 1) {
+                            _scrollController.animateTo(
+                                double.parse((200 * c).toString()),
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeIn);
+                            showSuccessMessage(
+                                context, "Seleziona l'articolo dalla lista");
+                            trovato = true;
+                            break;
+                          } else {
+                            if (!trovato) {
+                              if (value[0].alias != null &&
+                                  value[0].alias?.quantita != 0) {
+                                if (value[0].alias!.quantita ==
+                                    widget.articoli![c].confezione) {
+                                  trovato = true;
+                                  Navigator.pushNamed(
+                                          context,
+                                          AnagraficaArticolo
+                                              .route, //PAGINA LISTA ARTICOLI DA DOCUMENTI
+                                          arguments: PassaggioDatiArticolo(
+                                              articolo: widget.articoli![c],
+                                              modalita:
+                                                  widget.isOF ? "OF" : "OC",
+                                              documentoOF: widget.documento,
+                                              index: 0,
+                                              controlloOrdineCompleto: widget
+                                                  .controlloOrdineCompleto,
+                                              listaDocumenti:
+                                                  widget.listaDocumenti,
+                                              setDocumento: setDocumento,
+                                              listaArticoli: widget.isOF
+                                                  ? widget.documento!.articoli!
+                                                  : widget.articoli!,
+                                              articoloPicking: value[0],
+                                              isUbicazione: false))
+                                      .then((value) => refresh());
+                                }
+                              } else {
+                                trovato = true;
+                                Navigator.pushNamed(
+                                        context,
+                                        AnagraficaArticolo
+                                            .route, //PAGINA LISTA ARTICOLI DA DOCUMENTI
+                                        arguments: PassaggioDatiArticolo(
+                                            articolo: widget.articoli![c],
+                                            modalita: widget.isOF ? "OF" : "OC",
+                                            documentoOF: widget.documento,
+                                            index: 0,
+                                            controlloOrdineCompleto:
+                                                widget.controlloOrdineCompleto,
+                                            listaDocumenti:
+                                                widget.listaDocumenti,
+                                            setDocumento: setDocumento,
+                                            listaArticoli: widget.isOF
+                                                ? widget.documento!.articoli!
+                                                : widget.articoli!,
+                                            articoloPicking: value[0],
+                                            isUbicazione: false))
+                                    .then((value) => refresh());
+                              }
                             }
                           }
                         }
@@ -301,7 +380,8 @@ class ListaArticoliState extends State<ListaArticoli> {
                         listaArticoli: widget.isOF
                             ? widget.documento!.articoli!
                             : widget.articoli!,
-                        articoloPicking: null))
+                        articoloPicking: null,
+                        isUbicazione: widget.isUbicazione))
                 .then((value) => refresh());
           },
           onLongPress: () {

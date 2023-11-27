@@ -79,11 +79,41 @@ Ubicazione? getUbicazioneFromCode(String codice) {
 
 controlloOrdiniCompletati(List<DocumentoOF> lista) {
   for (int c = 0; c < lista.length; c++) {
+    if (controlloOrdineCompletoa(lista[c]) == false) {
+      return false;
+    }
+  }
+  return true;
+}
+
+controlloOrdiniCompletatia(List<DocumentoOF> lista) {
+  for (int c = 0; c < lista.length; c++) {
     if (controlloOrdineCompleto(lista[c]) == false) {
       return false;
     }
   }
   return true;
+}
+
+controlloOrdineCompletoa(DocumentoOF documento) {
+  int numeroArticoliCompleti = 0;
+
+  for (int c = 0; c < documento.articoli!.length; c++) {
+    Articolo art = documento.articoli![c];
+    if (art.picking != null) {
+      if (art.picking!.stato != " ") {
+        if (art.picking!.stato == "<" || art.picking!.stato == ">") {
+        } else {
+          numeroArticoliCompleti += 1;
+        }
+      }
+    }
+  }
+
+  if (numeroArticoliCompleti == documento.articoli?.length) {
+    return true;
+  }
+  return false;
 }
 
 controlloOrdineCompleto(DocumentoOF documento) {
@@ -233,29 +263,26 @@ apriDialogConferma(
   });
 }
 
-apriDialogConfermaOrdineCompletato(
-    BuildContext context,
-    List<DocumentoOF> lista,
-    DocumentoOF documento,
-    Function(DocumentoOF doc) tornaIndietro) {
+apriDialogConfermaOrdineCompletato(BuildContext context,
+    List<DocumentoOF> lista, DocumentoOF documento, Function() tornaIndietro) {
   showDialog<bool>(
     context: context,
     builder: (c) => AlertDialog(
       title: const Text('Ordine completato.'),
-      content: const Text("Vuoi passare all'ordine successivo?"),
+      //content: const Text("Vuoi passare all'ordine successivo?"),
       actions: [
-        TextButton(
+        /*  TextButton(
           child: const Text('No'),
           onPressed: () {
             //isShowing = false;
             Navigator.pop(c, false);
           },
-        ),
+        ),*/
         TextButton(
-          child: const Text('Si'),
+          child: const Text('Ok'),
           onPressed: () {
-            DocumentoOF a = lista[trovaOrdineSuccessivo(lista, documento)];
-            tornaIndietro(a);
+            // DocumentoOF a = lista[trovaOrdineSuccessivo(lista, documento)];
+            tornaIndietro();
             Navigator.pop(c, false);
           },
         ),
@@ -307,6 +334,7 @@ apriDialogAssociaAlias(BuildContext context, Articolo articolo,
   Http http = Http();
   TextEditingController codiceAlias = TextEditingController();
   TextEditingController q = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
   showDialog<bool>(
     context: context,
     builder: (c) => AlertDialog(
@@ -318,6 +346,7 @@ apriDialogAssociaAlias(BuildContext context, Articolo articolo,
               height: 8,
             ),
             TextField(
+              autofocus: true,
               controller: codiceAlias,
               style: const TextStyle(
                 fontSize: 14,
@@ -493,6 +522,7 @@ apriDialogDatiBF(
                 height: 8,
               ),
               TextField(
+                autofocus: true,
                 controller: numeroDocumento,
                 keyboardType: TextInputType.number,
                 maxLength: 6,

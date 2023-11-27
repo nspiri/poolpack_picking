@@ -62,7 +62,7 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
       Articolo art = documento.articoli![c];
       if (art.picking != null) {
         if (art.picking!.stato != " ") {
-          if (art.picking!.stato != "=" || art.picking!.stato == "#") {
+          if (art.picking!.stato != "=" && art.picking!.stato != "#") {
             sospesi++;
           }
         } else {
@@ -287,6 +287,7 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
             setDocumento: setOrdine,
             isOF: widget.ordine.isOF,
             setLoading: setLoading,
+            isUbicazione: false,
           ),
           loading()
         ],

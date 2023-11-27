@@ -18,6 +18,7 @@ class PickingPage extends StatefulWidget {
   final Function(int index) cambiaArticolo;
   final Function(DocumentoOF documento) tornaIndietro;
   final Function() setScrollDown;
+  final bool? isUbicazione;
   const PickingPage(
       {super.key,
       required this.articolo,
@@ -30,7 +31,8 @@ class PickingPage extends StatefulWidget {
       required this.isOF,
       required this.setScrollDown,
       required this.listaArticoli,
-      required this.articoloPicking});
+      required this.articoloPicking,
+      required this.isUbicazione});
 
   @override
   PickingPageState createState() => PickingPageState();
@@ -163,34 +165,79 @@ class PickingPageState extends State<PickingPage> {
         articolo.picking = value;
         setState(() {});
         if (!widget.isOF) {
-          if (controlloOrdineCompleto(documento!)) {
-            if (!controlloOrdiniCompletati(widget.listaDocumenti)) {
-              if (!widget.isOF) {
-                apriDialogConfermaOrdineCompletato(
-                    context,
-                    widget.listaDocumenti,
-                    widget.documento!,
-                    widget.tornaIndietro);
-              }
-            } else {
-              apriDialogOrdiniCompletati(context);
-            }
-          } else {
-            if (articolo.picking != null) {
-              var completo = true;
-              if (documento != null) {
-                if (documento!.articoli != null) {
-                  for (int c = 0; c < documento!.articoli!.length; c++) {
-                    if (documento?.articoli?[c].picking == null) {
-                      completo = false;
-                    }
-                  }
-                }
-              }
-              if (documento!.articoli!.length > 1) {
+          if (widget.isUbicazione != null) {
+            if (widget.isUbicazione!) {
+              if (controlloOrdiniCompletatia(widget.listaDocumenti)) {
+                apriDialogOrdiniCompletati(context);
+              } else {
                 apriDialogConferma(context, documento!, widget.index, articolo,
                     setArticolo, widget.listaArticoli);
                 _focusNode.unfocus();
+              }
+            } else {
+              if (controlloOrdineCompleto(documento!)) {
+                if (!controlloOrdiniCompletati(widget.listaDocumenti)) {
+                  if (!widget.isOF) {
+                    apriDialogConfermaOrdineCompletato(
+                      context,
+                      widget.listaDocumenti,
+                      widget.documento!,
+                      () => Navigator.pop(context),
+                    );
+                  }
+                } else {
+                  apriDialogOrdiniCompletati(context);
+                }
+              } else {
+                if (articolo.picking != null) {
+                  var completo = true;
+                  if (documento != null) {
+                    if (documento!.articoli != null) {
+                      for (int c = 0; c < documento!.articoli!.length; c++) {
+                        if (documento?.articoli?[c].picking == null) {
+                          completo = false;
+                        }
+                      }
+                    }
+                  }
+                  if (documento!.articoli!.length > 1) {
+                    apriDialogConferma(context, documento!, widget.index,
+                        articolo, setArticolo, widget.listaArticoli);
+                    _focusNode.unfocus();
+                  }
+                }
+              }
+            }
+          } else {
+            if (controlloOrdineCompleto(documento!)) {
+              if (!controlloOrdiniCompletati(widget.listaDocumenti)) {
+                if (!widget.isOF) {
+                  apriDialogConfermaOrdineCompletato(
+                      context,
+                      widget.listaDocumenti,
+                      widget.documento!,
+                      /*widget.tornaIndietro*/ () => Navigator.pop(context));
+                }
+              } else {
+                apriDialogOrdiniCompletati(context);
+              }
+            } else {
+              if (articolo.picking != null) {
+                var completo = true;
+                if (documento != null) {
+                  if (documento!.articoli != null) {
+                    for (int c = 0; c < documento!.articoli!.length; c++) {
+                      if (documento?.articoli?[c].picking == null) {
+                        completo = false;
+                      }
+                    }
+                  }
+                }
+                if (documento!.articoli!.length > 1) {
+                  apriDialogConferma(context, documento!, widget.index,
+                      articolo, setArticolo, widget.listaArticoli);
+                  _focusNode.unfocus();
+                }
               }
             }
           }
@@ -210,83 +257,18 @@ class PickingPageState extends State<PickingPage> {
     });
   }
 
-  controlloArticoloRicerca(Articolo? art) {
-    bool isValid = true;
-    for (int c = 0; c < 1; c++) {
-      if (art != null) {
-        if (articolo.colli != 0) {
-          if (articolo.codiceArticolo != art.codiceArticolo) {
-            showErrorMessage(context, "Articolo errato");
-            isValid = false;
-            articoloRicerca = null;
-            break;
-          }
-          if (art.alias != null) {
-            if (art.alias!.quantita != 0) {
-              if (articolo.quantita != art.alias!.quantita) {
-                showErrorMessage(context, "Quantità non corrispondente");
-                isValid = false;
-                articoloRicerca = null;
-                break;
-              } else {
-                qta.text = formatStringDecimal(
-                    art.alias!.quantita!, articolo.decimali!);
-              }
-            } else {
-              if (articolo.quantita != art.confezione) {
-                showErrorMessage(context, "Quantità non corrispondente");
-                isValid = false;
-                articoloRicerca = null;
-                break;
-              } else {
-                qta.text =
-                    formatStringDecimal(art.confezione!, articolo.decimali!);
-              }
-            }
-          } else {
-            if (articolo.quantita != art.confezione) {
-              showErrorMessage(context, "Quantità non corrispondente");
-              isValid = false;
-              articoloRicerca = null;
-              break;
-            } else {
-              qta.text =
-                  formatStringDecimal(art.confezione!, articolo.decimali!);
-            }
-            if (articolo.um != art.um) {
-              showErrorMessage(context, "Unità di misura non corrispondente");
-              isValid = false;
-              articoloRicerca = null;
-              break;
-            }
-          }
-        }
-      } else {
-        showErrorMessage(context, "Articolo non trovato");
-        isValid = false;
-      }
-    }
-
-    if (isValid) {
-      isEnabled = true;
-    } else {
-      isEnabled = false;
-      codiceArticolo.text = "";
-    }
-    setCampi();
-    setState(() {});
-  }
-
   controlloArticolo(Articolo? art) {
     bool isValid = true;
     do {
       if (art == null) {
         showErrorMessage(context, "Articolo non trovato");
+        _focusNode.requestFocus();
         isValid = false;
         break;
       }
       if (articolo.codiceArticolo != art.codiceArticolo) {
         showErrorMessage(context, "Articolo errato");
+        _focusNode.requestFocus();
         isValid = false;
         break;
       }
@@ -295,6 +277,7 @@ class PickingPageState extends State<PickingPage> {
           if (art.alias!.quantita! > 0) {
             if (articolo.quantita != art.alias!.quantita) {
               showErrorMessage(context, "Quantità non corrispondente");
+              _focusNode.requestFocus();
               isValid = false;
               break;
             }
@@ -303,6 +286,7 @@ class PickingPageState extends State<PickingPage> {
         if (articolo.prgTaglia != 0) {
           if (articolo.prgTaglia != art.prgTaglia) {
             showErrorMessage(context, "Taglia non corrispondente");
+            _focusNode.requestFocus();
             isValid = false;
             break;
           }
@@ -490,7 +474,7 @@ class PickingPageState extends State<PickingPage> {
                           decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: "Codice"),
-                          onEditingComplete: () {
+                          onSubmitted: (v) {
                             isLoading = true;
                             setState(() {});
                             http

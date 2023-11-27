@@ -1,15 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:http/http.dart' as hp;
+import 'package:http/http.dart';
 import 'package:poolpack_picking/Model/login_data.dart';
 import 'package:poolpack_picking/Pages/home.dart';
 import 'package:poolpack_picking/Pages/impostazioni.dart';
-import 'package:poolpack_picking/main.dart';
 import 'package:poolpack_picking/utils/dropdown.dart';
 import 'package:poolpack_picking/utils/global.dart';
 import 'package:poolpack_picking/utils/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/utils.dart';
-import 'package:auto_update/auto_update.dart';
+import 'package:ota_update/ota_update.dart';
 
 class Login extends StatefulWidget {
   static const route = "/login";
@@ -28,27 +30,42 @@ class LoginDemoState extends State<Login> {
   List<String> utenti = [];
   String? utenteSelezionato;
   Map<dynamic, dynamic> _packageUpdateUrl = {};
+  OtaEvent? currentEvent;
+  String currentVersion = "2023112701";
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
     //setIp();
     getUtenti();
+    tryOtaUpdate();
   }
 
-  Future<void> initPlatformState() async {
-    Map<dynamic, dynamic> updateUrl;
-    try {
-      updateUrl = await AutoUpdate.fetchGithub("nspiri", "poolpack_picking");
-    } on PlatformException {
-      updateUrl = {'assetUrl': 'Failed to get the url of the new release.'};
-    }
-    if (!mounted) return;
+  Future<void> tryOtaUpdate() async {
+    var url = Uri.parse("https://datasistemi.cloud/apk/poolpack/version1.txt");
+    Response response = await hp.get(url);
 
-    setState(() {
-      _packageUpdateUrl = updateUrl;
-    });
+    if (response.body != "") {
+      try {
+        int version = int.parse(response.body);
+        int curVer = int.parse(currentVersion);
+        if (version != curVer) {
+          print('ABI Platform: ${await OtaUpdate().getAbi()}');
+          OtaUpdate()
+              .execute(
+            'https://github.com/nspiri/poolpack_picking/releases/download/TRA/app-release.apk',
+            destinationFilename: 'poolpack_picking.apk',
+          )
+              .listen(
+            (OtaEvent event) {
+              setState(() => currentEvent = event);
+            },
+          );
+        }
+      } catch (e) {
+        print('Failed to make OTA update. Details: $e');
+      }
+    }
   }
 
   void validaCampi() {
@@ -129,11 +146,11 @@ class LoginDemoState extends State<Login> {
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColorDark,
       body: Stack(children: [
-        const Align(
+        Align(
           alignment: Alignment.bottomRight,
           child: Text(
-            'Versione: 06/10/2023 - 1.0 beta',
-            style: TextStyle(color: Colors.white),
+            'Versione: $currentVersion',
+            style: const TextStyle(color: Colors.white),
           ),
         ),
         Center(
@@ -206,6 +223,8 @@ class LoginDemoState extends State<Login> {
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text('© 2023 DATA SISTEMI All Rights Reserved'),
               ),
+              Text(
+                  'OTA status: ${currentEvent?.status} : ${currentEvent?.value} \n')
             ]),
           ),
           Positioned.fill(child: loading())

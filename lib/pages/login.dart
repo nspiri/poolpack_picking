@@ -31,7 +31,7 @@ class LoginDemoState extends State<Login> {
   String? utenteSelezionato;
   Map<dynamic, dynamic> _packageUpdateUrl = {};
   OtaEvent? currentEvent;
-  String currentVersion = "2023112701";
+  String currentVersion = "2023112803";
 
   @override
   void initState() {
@@ -42,7 +42,7 @@ class LoginDemoState extends State<Login> {
   }
 
   Future<void> tryOtaUpdate() async {
-    var url = Uri.parse("https://datasistemi.cloud/apk/poolpack/version1.txt");
+    var url = Uri.parse("https://datasistemi.cloud/apk/poolpack/version.txt");
     Response response = await hp.get(url);
 
     if (response.body != "") {
@@ -53,12 +53,14 @@ class LoginDemoState extends State<Login> {
           print('ABI Platform: ${await OtaUpdate().getAbi()}');
           OtaUpdate()
               .execute(
-            'https://github.com/nspiri/poolpack_picking/releases/download/TRA/app-release.apk',
-            destinationFilename: 'poolpack_picking.apk',
+            'https://datasistemi.cloud/apk/poolpack/app-release.apk',
+            destinationFilename: 'poolpack.apk',
           )
               .listen(
             (OtaEvent event) {
-              setState(() => currentEvent = event);
+              setState(() {
+                currentEvent = event;
+              });
             },
           );
         }
@@ -181,7 +183,10 @@ class LoginDemoState extends State<Login> {
             child: Column(children: [
               InkWell(
                   onLongPress: () {
-                    Navigator.pushNamed(context, ImpostazioniPage.route);
+                    Navigator.pushNamed(context, ImpostazioniPage.route)
+                        .then((value) {
+                      getUtenti();
+                    });
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(top: 20, bottom: 20),
@@ -219,15 +224,15 @@ class LoginDemoState extends State<Login> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8),
                 child: Text('© 2023 DATA SISTEMI All Rights Reserved'),
               ),
-              Text(
-                  'OTA status: ${currentEvent?.status} : ${currentEvent?.value} \n')
+              Text('${currentEvent?.status.name} : ${currentEvent?.value}%'),
             ]),
           ),
-          Positioned.fill(child: loading())
+          Positioned.fill(child: loading()),
+          Positioned.fill(child: loadingDownload())
         ]),
       ),
     );
@@ -274,6 +279,30 @@ class LoginDemoState extends State<Login> {
         child: const Center(
           child: Center(
             child: CircularProgressIndicator(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget loadingDownload() {
+    return Visibility(
+      visible: currentEvent?.status.name == "DOWNLOADING",
+      child: Container(
+        decoration: BoxDecoration(color: Colors.grey.withOpacity(0.5)),
+        child: Center(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                      '${currentEvent?.status.name} : ${currentEvent?.value}%'),
+                )
+              ],
+            ),
           ),
         ),
       ),

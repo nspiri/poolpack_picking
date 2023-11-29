@@ -10,13 +10,21 @@ class ControlloGiacenze extends StatefulWidget {
   ControlloGiacenzeState createState() => ControlloGiacenzeState();
 }
 
-class ControlloGiacenzeState extends State<ControlloGiacenze> {
+class ControlloGiacenzeState extends State<ControlloGiacenze>
+    with TickerProviderStateMixin {
+  late TabController controller;
+  TextEditingController codice = TextEditingController();
+  GlobalKey<ListaArticoliGState> globalKey = GlobalKey();
+  GlobalKey<ListaArticoliGState> globalKey2 = GlobalKey();
   @override
   void initState() {
     super.initState();
+    controller = TabController(vsync: this, length: 2);
+    controller.addListener(() {
+      globalKey.currentState?.setFocus();
+      globalKey2.currentState?.setFocus();
+    });
   }
-
-  TextEditingController codice = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +34,7 @@ class ControlloGiacenzeState extends State<ControlloGiacenze> {
         appBar: AppBar(
           title: const Text("Controllo giacenze"),
           bottom: TabBar(
+            // controller: controller,
             tabs: const [
               Tab(
                 text: "Articolo",
@@ -38,10 +47,11 @@ class ControlloGiacenzeState extends State<ControlloGiacenze> {
             labelColor: Colors.white,
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
+          // controller: controller,
           children: [
-            ListaArticoliG(isCercaArticolo: true),
-            ListaArticoliG(isCercaArticolo: false)
+            ListaArticoliG(isCercaArticolo: true, key: globalKey),
+            ListaArticoliG(isCercaArticolo: false, key: globalKey2)
           ],
         ),
       ),

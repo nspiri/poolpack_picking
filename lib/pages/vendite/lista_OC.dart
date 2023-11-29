@@ -231,37 +231,35 @@ class ListaOCState extends State<ListaOC> {
   Widget lista(bool isOC) {
     return Stack(
       children: [
-        Expanded(
-          child: Column(
-            children: [
-              filtroZone(),
-              Visibility(
-                  visible: isOC,
-                  child: Expanded(
-                      child: ListaVendite(
-                    documenti: documenti,
-                    getDocumenti: aggiornaDocumenti,
-                  ))),
-              Visibility(
-                visible: !isOC,
+        Column(
+          children: [
+            filtroZone(),
+            Visibility(
+                visible: isOC,
                 child: Expanded(
-                  child: ListaArticoli(
-                      articoli: articoli, //
-                      visualizzaDatiOrdine: false,
-                      documento: null, //
-                      listaDocumenti: documenti,
-                      controlloOrdineCompleto: () {
-                        articoli = [];
-                        getDocumenti(zonaSelezionata!.id!);
-                      },
-                      setDocumento: (DocumentoOF d) {},
-                      isOF: false,
-                      setLoading: setLoading,
-                      isUbicazione: true),
-                ),
+                    child: ListaVendite(
+                  documenti: documenti,
+                  getDocumenti: aggiornaDocumenti,
+                ))),
+            Visibility(
+              visible: !isOC,
+              child: Expanded(
+                child: ListaArticoli(
+                    articoli: articoli, //
+                    visualizzaDatiOrdine: false,
+                    documento: null, //
+                    listaDocumenti: documenti,
+                    controlloOrdineCompleto: () {
+                      articoli = [];
+                      getDocumenti(zonaSelezionata!.id!);
+                    },
+                    setDocumento: (DocumentoOF d) {},
+                    isOF: false,
+                    setLoading: setLoading,
+                    isUbicazione: true),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         loading()
       ],

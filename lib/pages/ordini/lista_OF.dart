@@ -56,20 +56,16 @@ class ListaOFState extends State<ListaOF> {
       appBar: AppBar(title: const Text("Ordini fornitore")),
       body: Stack(
         children: [
-          Expanded(
-            child: Container(
-              child: Column(
-                children: [
-                  //cardFiltri(),
-                  campoData(),
-                  Expanded(
-                      child: ListaOrdiniFornitore(
-                    documenti: documenti,
-                    getDocumenti: aggiornaDocumenti,
-                  ))
-                ],
-              ),
-            ),
+          Column(
+            children: [
+              //cardFiltri(),
+              campoData(),
+              Expanded(
+                  child: ListaOrdiniFornitore(
+                documenti: documenti,
+                getDocumenti: aggiornaDocumenti,
+              ))
+            ],
           ),
           loading()
         ],
@@ -212,9 +208,7 @@ class ListaOFState extends State<ListaOF> {
       child: Container(
         decoration: BoxDecoration(color: Colors.grey.withOpacity(0.5)),
         child: const Center(
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
+          child: CircularProgressIndicator(),
         ),
       ),
     );

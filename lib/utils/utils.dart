@@ -365,6 +365,7 @@ apriDialogAssociaAlias(BuildContext context, Articolo articolo,
               visible: articolo.prgTaglia == 0,
               child: TextField(
                 controller: q,
+                keyboardType: TextInputType.number,
                 style: const TextStyle(
                   fontSize: 14,
                   color: Colors.black,
@@ -392,7 +393,9 @@ apriDialogAssociaAlias(BuildContext context, Articolo articolo,
             setLoading(true);
             var quantita = articolo.confezione;
             if (articolo.prgTaglia == 0) {
-              quantita = double.parse(q.text);
+              if (q.text != "") {
+                quantita = double.parse(q.text);
+              }
             }
             http
                 .associaAlias(codiceAlias.text, articolo.codiceArticolo!,

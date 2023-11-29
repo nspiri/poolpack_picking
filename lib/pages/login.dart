@@ -29,9 +29,8 @@ class LoginDemoState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
   List<String> utenti = [];
   String? utenteSelezionato;
-  Map<dynamic, dynamic> _packageUpdateUrl = {};
   OtaEvent? currentEvent;
-  String currentVersion = "2023112803";
+  String currentVersion = "2023112908";
 
   @override
   void initState() {
@@ -42,7 +41,8 @@ class LoginDemoState extends State<Login> {
   }
 
   Future<void> tryOtaUpdate() async {
-    var url = Uri.parse("https://datasistemi.cloud/apk/poolpack/version.txt");
+    var url = Uri.parse(
+        "https://download.datasistemi.cloud/apk/poolpack/version.txt");
     Response response = await hp.get(url);
 
     if (response.body != "") {
@@ -53,8 +53,9 @@ class LoginDemoState extends State<Login> {
           print('ABI Platform: ${await OtaUpdate().getAbi()}');
           OtaUpdate()
               .execute(
-            'https://datasistemi.cloud/apk/poolpack/app-release.apk',
-            destinationFilename: 'poolpack.apk',
+            'https://download.datasistemi.cloud/apk/poolpack/app-release.apk',
+            //"https://internal1.4q.sk/flutter_hello_world.apk",
+            destinationFilename: 'app-release-temp.apk',
           )
               .listen(
             (OtaEvent event) {
@@ -143,28 +144,35 @@ class LoginDemoState extends State<Login> {
     });
   }
 
+  Future<bool> _onWillPop() async {
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColorDark,
-      body: Stack(children: [
-        Align(
-          alignment: Alignment.bottomRight,
-          child: Text(
-            'Versione: $currentVersion',
-            style: const TextStyle(color: Colors.white),
-          ),
-        ),
-        Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[Center(child: cardLogin())],
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).primaryColorDark,
+        body: Stack(children: [
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Text(
+              'Versione: $currentVersion',
+              style: const TextStyle(color: Colors.white),
             ),
           ),
-        ),
-      ]),
+          Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[Center(child: cardLogin())],
+              ),
+            ),
+          ),
+        ]),
+      ),
     );
   }
 
@@ -228,7 +236,6 @@ class LoginDemoState extends State<Login> {
                 padding: EdgeInsets.only(bottom: 8),
                 child: Text('© 2023 DATA SISTEMI All Rights Reserved'),
               ),
-              Text('${currentEvent?.status.name} : ${currentEvent?.value}%'),
             ]),
           ),
           Positioned.fill(child: loading()),

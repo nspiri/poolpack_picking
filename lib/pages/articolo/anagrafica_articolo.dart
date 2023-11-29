@@ -433,47 +433,45 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
       ),
       body: Stack(
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.only(top: 8, left: 5, right: 5),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  testata(),
-                  Visibility(
-                    visible: modalita == "OF" || modalita == "OC",
-                    child: PickingPage(
-                      key: globalKeyPicking,
-                      articolo: articolo,
-                      documento: documento,
-                      index: index,
-                      controlloOrdineCompleto:
-                          widget.dati.controlloOrdineCompleto!,
-                      cambiaArticolo: setArticolo,
-                      listaDocumenti: widget.dati.listaDocumenti ?? [],
-                      tornaIndietro: tornaListaArticoli,
-                      isOF: modalita == "OF" ? true : false,
-                      setScrollDown: setScrollDown,
-                      listaArticoli: widget.dati.listaArticoli,
-                      articoloPicking: widget.dati.articoloPicking,
-                      isUbicazione: widget.dati.isUbicazione,
-                    ),
-                  ),
-                  UbicazioniPage(
-                    key: globalKey,
-                    esistenze: articolo.esistenza ?? [],
+          SingleChildScrollView(
+            controller: scrollController,
+            padding: const EdgeInsets.only(top: 8, left: 5, right: 5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                testata(),
+                Visibility(
+                  visible: modalita == "OF" || modalita == "OC",
+                  child: PickingPage(
+                    key: globalKeyPicking,
                     articolo: articolo,
-                    isTrasferisci: isTrasferisci,
-                    dati: widget.dati,
-                    setLoading: setLoading,
+                    documento: documento,
+                    index: index,
+                    controlloOrdineCompleto:
+                        widget.dati.controlloOrdineCompleto!,
+                    cambiaArticolo: setArticolo,
+                    listaDocumenti: widget.dati.listaDocumenti ?? [],
+                    tornaIndietro: tornaListaArticoli,
+                    isOF: modalita == "OF" ? true : false,
+                    setScrollDown: setScrollDown,
+                    listaArticoli: widget.dati.listaArticoli,
+                    articoloPicking: widget.dati.articoloPicking,
+                    isUbicazione: widget.dati.isUbicazione,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  )
-                ],
-              ),
+                ),
+                UbicazioniPage(
+                  key: globalKey,
+                  esistenze: articolo.esistenza ?? [],
+                  articolo: articolo,
+                  isTrasferisci: isTrasferisci,
+                  dati: widget.dati,
+                  setLoading: setLoading,
+                ),
+                const SizedBox(
+                  height: 10,
+                )
+              ],
             ),
           ),
           loading()

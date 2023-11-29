@@ -16,19 +16,24 @@ class ListaArticoliG extends StatefulWidget {
   ListaArticoliGState createState() => ListaArticoliGState();
 }
 
-class ListaArticoliGState extends State<ListaArticoliG> {
+class ListaArticoliGState extends State<ListaArticoliG>
+    with AutomaticKeepAliveClientMixin<ListaArticoliG> {
   TextEditingController codice = TextEditingController();
   late final bool isCercaArticolo;
   Http http = Http();
   bool isLoading = false;
   List<Articolo> articoli = [];
   String codiceSelezionato = "";
+  FocusNode focus = FocusNode();
 
   @override
   void initState() {
     super.initState();
     isCercaArticolo = widget.isCercaArticolo;
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   controlloArticoli(List<Articolo> articoli) {
     if (articoli.length == 1) {
@@ -51,6 +56,10 @@ class ListaArticoliGState extends State<ListaArticoliG> {
       this.articoli = [];
     }
     setState(() {});
+  }
+
+  setFocus() {
+    focus.requestFocus();
   }
 
   int? cercaIdUbicazione(String ubicazione) {
@@ -167,6 +176,7 @@ class ListaArticoliGState extends State<ListaArticoliG> {
                       padding: const EdgeInsets.only(right: 8),
                       child: TextField(
                         controller: codice,
+                        focusNode: focus,
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black,
@@ -176,7 +186,7 @@ class ListaArticoliGState extends State<ListaArticoliG> {
                             labelText: isCercaArticolo
                                 ? "Codice articolo"
                                 : "Codice ubicazione"),
-                        onEditingComplete: () {
+                        onSubmitted: (a) {
                           isLoading = true;
                           setState(() {});
                           if (isCercaArticolo) {
@@ -390,11 +400,8 @@ class ListaArticoliGState extends State<ListaArticoliG> {
             ),
             Text(
               isCercaArticolo
-                  ? articolo.esistenzaTotale!
-                      .toStringAsFixed(articolo.decimali!)
-                  : formatStringDecimal(
-                      getEsistenzaFromUbicazione(articolo.esistenza!),
-                      articolo.decimali!),
+                  ? "${formatStringDecimal(articolo.esistenzaTotale!, articolo.decimali!)} ${articolo.um}"
+                  : "${formatStringDecimal(getEsistenzaFromUbicazione(articolo.esistenza!), articolo.decimali!)} ${articolo.um}",
               style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,

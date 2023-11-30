@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:poolpack_picking/Model/magazzino.dart';
 import 'package:poolpack_picking/pages/articolo/anagrafica_articolo.dart';
+import 'package:poolpack_picking/pages/ordini/componenti/indicatore_ordine.dart';
 import 'package:poolpack_picking/utils/global.dart';
 import 'package:poolpack_picking/utils/http.dart';
 import 'package:poolpack_picking/Model/ordini_fornitori.dart';
@@ -41,6 +42,8 @@ class ListaArticoliState extends State<ListaArticoli> {
   TextEditingController codiceArticolo = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   final _scrollController = ScrollController();
+  List<Articolo> articoliFiltrati = [];
+  String coloreFiltro = "";
 
   refresh() {
     if (!widget.isOF) {
@@ -51,6 +54,11 @@ class ListaArticoliState extends State<ListaArticoli> {
 
   setDocumento(DocumentoOF doc) {
     widget.setDocumento(doc);
+  }
+
+  setColoreFiltro(String colore) {
+    coloreFiltro = colore;
+    setState(() {});
   }
 
   chiediConfermaResiduoSospeso(Articolo articolo, int index) {
@@ -342,12 +350,42 @@ class ListaArticoliState extends State<ListaArticoli> {
             ),
           ),
         ),
+        Indicatore(
+          articoli: widget.articoli ?? [],
+          setColoreFiltro: setColoreFiltro,
+        ),
         Expanded(
           child: ListView.builder(
             controller: _scrollController,
             itemCount: widget.articoli?.length,
             itemBuilder: (context, index) {
-              return cardArticolo(widget.articoli![index], index);
+              //coloreFiltro = "";
+              print(coloreFiltro);
+              if (coloreFiltro == "") {
+                return cardArticolo(widget.articoli![index], index);
+              }
+              if (coloreFiltro == "GR") {
+                if (widget.articoli?[index].picking == null) {
+                  return cardArticolo(widget.articoli![index], index);
+                }
+              }
+              if (coloreFiltro == "R") {
+                if (widget.articoli?[index].picking?.stato == "<" ||
+                    widget.articoli?[index].picking?.stato == ">") {
+                  return cardArticolo(widget.articoli![index], index);
+                }
+              }
+              if (coloreFiltro == "GI") {
+                if (widget.articoli?[index].picking?.stato == "#") {
+                  return cardArticolo(widget.articoli![index], index);
+                }
+              }
+              if (coloreFiltro == "V") {
+                if (widget.articoli?[index].picking?.stato == "=") {
+                  return cardArticolo(widget.articoli![index], index);
+                }
+              }
+              return SizedBox();
             },
           ),
         ),

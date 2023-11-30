@@ -240,6 +240,7 @@ class ListaOCState extends State<ListaOC> {
                     child: ListaVendite(
                   documenti: documenti,
                   getDocumenti: aggiornaDocumenti,
+                  setLoading: setLoading,
                 ))),
             Visibility(
               visible: !isOC,

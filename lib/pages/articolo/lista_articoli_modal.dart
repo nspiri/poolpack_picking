@@ -73,9 +73,13 @@ class FullScreenSearchModalArticoli extends ModalRoute {
                       ),
                       onChanged: (value) {
                         articoliFiltrati = articoli
-                            .where((item) => item.codiceArticolo!
-                                .toLowerCase()
-                                .contains(value.toLowerCase()))
+                            .where((item) =>
+                                item.codiceArticolo!
+                                    .toLowerCase()
+                                    .contains(value.toLowerCase()) ||
+                                item.descrizione!
+                                    .toLowerCase()
+                                    .contains(value.toLowerCase()))
                             .toList();
                         changedExternalState();
                       },
@@ -95,7 +99,7 @@ class FullScreenSearchModalArticoli extends ModalRoute {
               ),
               const Padding(
                 padding: EdgeInsets.only(left: 5, bottom: 5),
-                child: Text('Ubicazioni',
+                child: Text('Articoli',
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ),
@@ -111,7 +115,13 @@ class FullScreenSearchModalArticoli extends ModalRoute {
                       child: ListTile(
                         title: Text(
                           articoliFiltrati[index].codiceArticolo!,
-                          style: const TextStyle(color: Colors.black),
+                          style: const TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          articoliFiltrati[index].descrizione!,
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 12),
                         ),
                         onTap: () {
                           Navigator.of(context).pop(articoliFiltrati[index]);

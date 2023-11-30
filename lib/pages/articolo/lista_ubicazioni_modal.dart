@@ -136,7 +136,20 @@ class FullScreenSearchModal extends ModalRoute {
                                   : ubicazioniFiltrate[index].id ==
                                           ubicazionePredefinita?.id
                                       ? Colors.green
-                                      : Colors.black),
+                                      : Colors.black,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          ubicazioniFiltrate[index].descrizione!,
+                          style: TextStyle(
+                              color: ubicazioniFiltrate[index].id ==
+                                      ubicazioneSel?.id
+                                  ? Colors.grey
+                                  : ubicazioniFiltrate[index].id ==
+                                          ubicazionePredefinita?.id
+                                      ? Colors.green
+                                      : Colors.black,
+                              fontSize: 12),
                         ),
                         onTap: () {
                           if (ubicazioniFiltrate[index].id !=

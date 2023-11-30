@@ -52,6 +52,8 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
     if (modalita == "OF" || modalita == "OC") {
       menu.add(
           const PopupMenuItem<int>(value: 3, child: Text('Conferma quantità')));
+      menu.add(
+          const PopupMenuItem<int>(value: 8, child: Text('Conferma articolo')));
     }
     if (modalita == "CG") {
       menu.add(const PopupMenuItem<int>(
@@ -82,12 +84,58 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
   }
 
   cambiaArticolo(int index) {
-    articolo = widget.dati.listaArticoli[index];
+    /* articolo = widget.dati.listaArticoli[index];
     documento = widget.dati.documentoOF ?? cercaDocumento();
     var scrollPosition = scrollController.position;
     scrollController.animateTo(scrollPosition.minScrollExtent,
         duration: const Duration(milliseconds: 500), curve: Curves.ease);
-    setState(() {});
+    setState(() {});*/
+    PassaggioDatiArticolo dati = widget.dati;
+    dati.articolo = widget.dati.listaArticoli[index];
+    dati.index = index;
+    documento = widget.dati.documentoOF ?? cercaDocumento();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AnagraficaArticolo(
+          dati: dati,
+        ),
+      ),
+    );
+  }
+
+  avanti(int index) {
+    if (index + 1 < widget.dati.listaArticoli.length) {
+      PassaggioDatiArticolo dati = widget.dati;
+      dati.articolo = widget.dati.listaArticoli[index + 1];
+      dati.index = index + 1;
+      documento = widget.dati.documentoOF ?? cercaDocumento();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AnagraficaArticolo(
+            dati: dati,
+          ),
+        ),
+      );
+    }
+  }
+
+  indietro(int index) {
+    if (index - 1 >= 0) {
+      PassaggioDatiArticolo dati = widget.dati;
+      dati.articolo = widget.dati.listaArticoli[index - 1];
+      dati.index = index - 1;
+      documento = widget.dati.documentoOF ?? cercaDocumento();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AnagraficaArticolo(
+            dati: dati,
+          ),
+        ),
+      );
+    }
   }
 
   setScrollDown() {
@@ -268,7 +316,9 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
             });
           }
         });
-
+        break;
+      case 8:
+        globalKeyPicking.currentState?.validaArticolo();
         break;
     }
   }
@@ -421,11 +471,33 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
         actions: <Widget>[
           IconButton(
               onPressed: () {
+                indietro(index);
+              },
+              icon: const Icon(
+                Icons.arrow_left,
+                size: 30,
+              )),
+          IconButton(
+              onPressed: () {
                 Navigator.pushNamed(context, HomePage.route);
               },
-              icon: const Icon(Icons.home)),
+              icon: const Icon(
+                Icons.home,
+                size: 30,
+              )),
+          IconButton(
+              onPressed: () {
+                avanti(index);
+              },
+              icon: const Icon(
+                Icons.arrow_right,
+                size: 30,
+              )),
           PopupMenuButton<int>(
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(
+              Icons.more_vert,
+              size: 30,
+            ),
             onSelected: handleClick,
             itemBuilder: (BuildContext context) => menu,
           ),

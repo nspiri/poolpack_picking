@@ -1,14 +1,22 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:poolpack_picking/Model/ordini_fornitori.dart';
+import 'package:poolpack_picking/pages/login.dart';
 import 'package:poolpack_picking/pages/ordini/lista_ART.dart';
+import 'package:poolpack_picking/utils/utils.dart';
 
 class ListaVendite extends StatefulWidget {
   final List<DocumentoOF> documenti;
   final Function() getDocumenti;
-  const ListaVendite(
-      {super.key, required this.documenti, required this.getDocumenti});
+  final Function(bool value) setLoading;
+  const ListaVendite({
+    super.key,
+    required this.documenti,
+    required this.getDocumenti,
+    required this.setLoading,
+  });
 
   @override
   ListaVenditeState createState() => ListaVenditeState();
@@ -85,6 +93,50 @@ class ListaVenditeState extends State<ListaVendite> {
     return {};
   }
 
+  evadiOrdine(DocumentoOF documento) {
+    List<EvadiDocumento> dati = [];
+    EvadiDocumento doc = EvadiDocumento(
+      dataTras: DateFormat("yyyyMMdd").format(DateTime.now()),
+      documento: "OC",
+      documentoTras: "",
+      serie: documento.serie,
+      numero: documento.numero,
+      numeroTras: 0,
+    );
+    dati.add(doc);
+
+    widget.setLoading(true);
+    setState(() {});
+    http.evadiDocumenti(dati, context).then((value) {
+      widget.setLoading(false);
+      if (value) {
+        showSuccessMessage(context, "Ordini cliente evasi");
+      }
+      widget.getDocumenti();
+    });
+  }
+
+  controlloOrdineCompletoa(DocumentoOF documento) {
+    int numeroArticoliCompleti = 0;
+
+    for (int c = 0; c < documento.articoli!.length; c++) {
+      Articolo art = documento.articoli![c];
+      if (art.picking != null) {
+        if (art.picking!.stato != " ") {
+          if (art.picking!.stato == "<" || art.picking!.stato == ">") {
+          } else {
+            numeroArticoliCompleti += 1;
+          }
+        }
+      }
+    }
+
+    if (numeroArticoliCompleti == documento.articoli?.length) {
+      return true;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -109,6 +161,11 @@ class ListaVenditeState extends State<ListaVendite> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: InkWell(
+            onLongPress: () {
+              if (controlloOrdineCompletoa(documento)) {
+                //TODO chiedi evasione
+              }
+            },
             onTap: () {
               Navigator.pushNamed(
                       context,

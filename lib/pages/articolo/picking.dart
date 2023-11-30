@@ -170,9 +170,13 @@ class PickingPageState extends State<PickingPage> {
               if (controlloOrdiniCompletatia(widget.listaDocumenti)) {
                 apriDialogOrdiniCompletati(context);
               } else {
-                apriDialogConferma(context, documento!, widget.index, articolo,
+                int index = articoloSuccessivo(
+                    widget.index, widget.listaArticoli, articolo);
+                setArticolo(index);
+
+                /* apriDialogConferma(context, documento!, widget.index, articolo,
                     setArticolo, widget.listaArticoli);
-                _focusNode.unfocus();
+                _focusNode.unfocus();*/
               }
             } else {
               if (controlloOrdineCompleto(documento!)) {
@@ -201,9 +205,12 @@ class PickingPageState extends State<PickingPage> {
                     }
                   }
                   if (documento!.articoli!.length > 1) {
-                    apriDialogConferma(context, documento!, widget.index,
+                    int index = articoloSuccessivo(
+                        widget.index, widget.listaArticoli, articolo);
+                    setArticolo(index);
+                    /* apriDialogConferma(context, documento!, widget.index,
                         articolo, setArticolo, widget.listaArticoli);
-                    _focusNode.unfocus();
+                    _focusNode.unfocus();*/
                   }
                 }
               }
@@ -234,9 +241,12 @@ class PickingPageState extends State<PickingPage> {
                   }
                 }
                 if (documento!.articoli!.length > 1) {
-                  apriDialogConferma(context, documento!, widget.index,
+                  int index = articoloSuccessivo(
+                      widget.index, widget.listaArticoli, articolo);
+                  setArticolo(index);
+                  /*apriDialogConferma(context, documento!, widget.index,
                       articolo, setArticolo, widget.listaArticoli);
-                  _focusNode.unfocus();
+                  _focusNode.unfocus();*/
                 }
               }
             }
@@ -257,6 +267,27 @@ class PickingPageState extends State<PickingPage> {
     });
   }
 
+  validaArticolo() {
+    isEnabled = true;
+    widget.setScrollDown();
+    if (articolo.colli == 0) {
+      if (articolo.picking != null) {
+        qta.text = formatStringDecimal(
+            articolo.picking!.quantita!, articolo.decimali!);
+      } else {
+        qta.text = formatStringDecimal(articolo.quantita!, articolo.decimali!);
+      }
+
+      isQtaEnabled = true;
+    } else {
+      if (articolo.picking != null) {
+        colli.text = articolo.picking!.colli.toString();
+      } else {
+        colli.text = articolo.colli.toString();
+      }
+    }
+  }
+
   controlloArticolo(Articolo? art) {
     bool isValid = true;
     do {
@@ -274,12 +305,14 @@ class PickingPageState extends State<PickingPage> {
       }
       if (art.alias != null) {
         if (articolo.colli != 0) {
-          if (art.alias!.quantita! > 0) {
-            if (articolo.quantita != art.alias!.quantita) {
-              showErrorMessage(context, "Quantità non corrispondente");
-              _focusNode.requestFocus();
-              isValid = false;
-              break;
+          if (widget.isOF) {
+            if (art.alias!.quantita! > 0) {
+              if (articolo.quantita != art.alias!.quantita) {
+                showErrorMessage(context, "Quantità non corrispondente");
+                _focusNode.requestFocus();
+                isValid = false;
+                break;
+              }
             }
           }
         }

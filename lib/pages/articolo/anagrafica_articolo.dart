@@ -84,57 +84,54 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
   }
 
   cambiaArticolo(int index) {
-    /* articolo = widget.dati.listaArticoli[index];
+    articolo = widget.dati.listaArticoli[index];
     documento = widget.dati.documentoOF ?? cercaDocumento();
+    ubicazione = getUbicazione(articolo.idUbicazione!);
+    this.index = index;
     var scrollPosition = scrollController.position;
     scrollController.animateTo(scrollPosition.minScrollExtent,
         duration: const Duration(milliseconds: 500), curve: Curves.ease);
-    setState(() {});*/
-    PassaggioDatiArticolo dati = widget.dati;
+    setState(() {});
+    /* PassaggioDatiArticolo dati = widget.dati;
     dati.articolo = widget.dati.listaArticoli[index];
     dati.index = index;
     documento = widget.dati.documentoOF ?? cercaDocumento();
-    Navigator.pushReplacement(
+     if (widget.dati.aggiornaDocumenti != null) {
+      widget.dati.aggiornaDocumenti!();
+    }*/
+    /*  Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => AnagraficaArticolo(
           dati: dati,
         ),
       ),
-    );
+    ).then((value) {
+      /*if (widget.dati.aggiornaDocumenti != null) {
+        widget.dati.aggiornaDocumenti!();
+      }*/
+    });*/
   }
 
   avanti(int index) {
     if (index + 1 < widget.dati.listaArticoli.length) {
-      PassaggioDatiArticolo dati = widget.dati;
-      dati.articolo = widget.dati.listaArticoli[index + 1];
-      dati.index = index + 1;
+      articolo = widget.dati.listaArticoli[index + 1];
       documento = widget.dati.documentoOF ?? cercaDocumento();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AnagraficaArticolo(
-            dati: dati,
-          ),
-        ),
-      );
+      ubicazione = getUbicazione(articolo.idUbicazione!);
+      this.index = index + 1;
+      globalKeyPicking.currentState?.setCampiCambio(articolo);
+      setState(() {});
     }
   }
 
   indietro(int index) {
     if (index - 1 >= 0) {
-      PassaggioDatiArticolo dati = widget.dati;
-      dati.articolo = widget.dati.listaArticoli[index - 1];
-      dati.index = index - 1;
+      articolo = widget.dati.listaArticoli[index - 1];
       documento = widget.dati.documentoOF ?? cercaDocumento();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => AnagraficaArticolo(
-            dati: dati,
-          ),
-        ),
-      );
+      ubicazione = getUbicazione(articolo.idUbicazione!);
+      this.index = index - 1;
+      globalKeyPicking.currentState?.setCampiCambio(articolo);
+      setState(() {});
     }
   }
 
@@ -469,37 +466,27 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
               )
             : const Text("Articolo"),
         actions: <Widget>[
-          IconButton(
-              onPressed: () {
-                indietro(index);
-              },
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: IconButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, HomePage.route);
+                },
+                icon: const Icon(
+                  Icons.home,
+                  size: 30,
+                )),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: PopupMenuButton<int>(
               icon: const Icon(
-                Icons.arrow_left,
+                Icons.more_vert,
                 size: 30,
-              )),
-          IconButton(
-              onPressed: () {
-                Navigator.pushNamed(context, HomePage.route);
-              },
-              icon: const Icon(
-                Icons.home,
-                size: 30,
-              )),
-          IconButton(
-              onPressed: () {
-                avanti(index);
-              },
-              icon: const Icon(
-                Icons.arrow_right,
-                size: 30,
-              )),
-          PopupMenuButton<int>(
-            icon: const Icon(
-              Icons.more_vert,
-              size: 30,
+              ),
+              onSelected: handleClick,
+              itemBuilder: (BuildContext context) => menu,
             ),
-            onSelected: handleClick,
-            itemBuilder: (BuildContext context) => menu,
           ),
         ],
       ),
@@ -532,6 +519,9 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
                     isUbicazione: widget.dati.isUbicazione,
                   ),
                 ),
+                Visibility(
+                    visible: widget.dati.modalita != "CG",
+                    child: pulsantiNavigazione()),
                 UbicazioniPage(
                   key: globalKey,
                   esistenze: articolo.esistenza ?? [],
@@ -620,6 +610,50 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget pulsantiNavigazione() {
+    return Container(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(right: 4, left: 4),
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(
+                      color: Theme.of(context).primaryColorDark, width: 2),
+                  borderRadius: const BorderRadius.all(Radius.circular(10))),
+              child: InkWell(
+                onTap: () => indietro(index),
+                child: const Icon(
+                  Icons.keyboard_arrow_left_outlined,
+                  size: 40,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 4, right: 4),
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(
+                      color: Theme.of(context).primaryColorDark, width: 2),
+                  borderRadius: const BorderRadius.all(Radius.circular(10))),
+              child: InkWell(
+                onTap: () => avanti(index),
+                child: const Icon(
+                  Icons.keyboard_arrow_right_outlined,
+                  size: 40,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ]),
     );
   }
 

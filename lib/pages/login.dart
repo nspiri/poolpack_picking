@@ -30,7 +30,7 @@ class LoginDemoState extends State<Login> {
   List<String> utenti = [];
   String? utenteSelezionato;
   OtaEvent? currentEvent;
-  String currentVersion = "2023112908";
+  String currentVersion = "2023120402";
 
   @override
   void initState() {
@@ -49,7 +49,7 @@ class LoginDemoState extends State<Login> {
       try {
         int version = int.parse(response.body);
         int curVer = int.parse(currentVersion);
-        if (version != curVer) {
+        if (version > curVer) {
           print('ABI Platform: ${await OtaUpdate().getAbi()}');
           OtaUpdate()
               .execute(

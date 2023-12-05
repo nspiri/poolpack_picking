@@ -83,13 +83,14 @@ class PickingPageState extends State<PickingPage> {
     widget.cambiaArticolo(i);
     isEnabled = false;
     isQtaEnabled = false;
-    setCampiCambio();
+    setCampiCambio(articolo);
     _focusNode.requestFocus();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
     setState(() {});
   }
 
-  setCampiCambio() {
+  setCampiCambio(Articolo articolo) {
+    this.articolo = articolo;
     if (articolo.colli != 0) {
       if (articolo.picking != null) {
         colli.text = articolo.picking!.colli.toString();
@@ -159,9 +160,8 @@ class PickingPageState extends State<PickingPage> {
 
     http.setPickingOrdini(data, context).then((value) {
       isLoading = false;
-
+      setState(() {});
       if (value != null) {
-        //widget.documento?.articoli?[widget.index].picking = value;
         articolo.picking = value;
         setState(() {});
         if (!widget.isOF) {
@@ -173,10 +173,6 @@ class PickingPageState extends State<PickingPage> {
                 int index = articoloSuccessivo(
                     widget.index, widget.listaArticoli, articolo);
                 setArticolo(index);
-
-                /* apriDialogConferma(context, documento!, widget.index, articolo,
-                    setArticolo, widget.listaArticoli);
-                _focusNode.unfocus();*/
               }
             } else {
               if (controlloOrdineCompleto(documento!)) {

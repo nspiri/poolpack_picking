@@ -18,6 +18,7 @@ class ListaArticoli extends StatefulWidget {
   final Function() controlloOrdineCompleto;
   final Function(DocumentoOF doc) setDocumento;
   final Function(bool val) setLoading;
+  final Function() aggiornaLista;
   final bool? isUbicazione;
   const ListaArticoli(
       {super.key,
@@ -29,7 +30,8 @@ class ListaArticoli extends StatefulWidget {
       required this.setDocumento,
       required this.isOF,
       required this.setLoading,
-      required this.isUbicazione});
+      required this.isUbicazione,
+      required this.aggiornaLista});
 
   @override
   ListaArticoliState createState() => ListaArticoliState();
@@ -57,7 +59,11 @@ class ListaArticoliState extends State<ListaArticoli> {
   }
 
   setColoreFiltro(String colore) {
-    coloreFiltro = colore;
+    if (coloreFiltro == colore) {
+      coloreFiltro = "";
+    } else {
+      coloreFiltro = colore;
+    }
     setState(() {});
   }
 
@@ -244,7 +250,9 @@ class ListaArticoliState extends State<ListaArticoli> {
                                               ? widget.documento!.articoli!
                                               : widget.articoli!,
                                           articoloPicking: value[0],
-                                          isUbicazione: false))
+                                          isUbicazione: false,
+                                          aggiornaDocumenti:
+                                              widget.aggiornaLista))
                                   .then((value) => refresh());
                             }
                           }
@@ -301,7 +309,9 @@ class ListaArticoliState extends State<ListaArticoli> {
                                                   ? widget.documento!.articoli!
                                                   : widget.articoli!,
                                               articoloPicking: value[0],
-                                              isUbicazione: false))
+                                              isUbicazione: false,
+                                              aggiornaDocumenti:
+                                                  widget.aggiornaLista))
                                       .then((value) => refresh());
                                 }
                               } else {
@@ -324,7 +334,9 @@ class ListaArticoliState extends State<ListaArticoli> {
                                                 ? widget.documento!.articoli!
                                                 : widget.articoli!,
                                             articoloPicking: value[0],
-                                            isUbicazione: false))
+                                            isUbicazione: false,
+                                            aggiornaDocumenti:
+                                                widget.aggiornaLista))
                                     .then((value) => refresh());
                               }
                             }
@@ -419,7 +431,8 @@ class ListaArticoliState extends State<ListaArticoli> {
                             ? widget.documento!.articoli!
                             : widget.articoli!,
                         articoloPicking: null,
-                        isUbicazione: widget.isUbicazione))
+                        isUbicazione: widget.isUbicazione,
+                        aggiornaDocumenti: widget.aggiornaLista))
                 .then((value) => refresh());
           },
           onLongPress: () {

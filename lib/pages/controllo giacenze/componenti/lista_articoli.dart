@@ -48,7 +48,8 @@ class ListaArticoliGState extends State<ListaArticoliG>
                   setDocumento: (DocumentoOF a) {},
                   listaArticoli: articoli,
                   articoloPicking: null,
-                  isUbicazione: false))
+                  isUbicazione: false,
+                  aggiornaDocumenti: null))
           .then((value) {
         aggiornaArticoli();
       });
@@ -274,7 +275,8 @@ class ListaArticoliGState extends State<ListaArticoliG>
                         setDocumento: (DocumentoOF doc) {},
                         listaArticoli: articoli,
                         articoloPicking: null,
-                        isUbicazione: false))
+                        isUbicazione: false,
+                        aggiornaDocumenti: null))
                 .then((value) {
               aggiornaArticoli();
             });

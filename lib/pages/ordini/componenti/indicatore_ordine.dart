@@ -50,21 +50,22 @@ class IndicatoreState extends State<Indicatore> {
       }
     }
 
-    if (grigi > 0) {
-      lista.add(container(grigi.round(), Colors.grey, "GR"));
-    }
-
-    if (rossi > 0) {
-      lista.add(container(rossi.round(), Colors.red, "R"));
+    if (verdi > 0) {
+      lista.add(container(verdi.round(), Colors.green, "V"));
     }
 
     if (gialli > 0) {
       lista.add(container(gialli.round(), Colors.yellow.shade700, "GI"));
     }
 
-    if (verdi > 0) {
-      lista.add(container(verdi.round(), Colors.green, "V"));
+    if (rossi > 0) {
+      lista.add(container(rossi.round(), Colors.red, "R"));
     }
+
+    if (grigi > 0) {
+      lista.add(container(grigi.round(), Colors.grey, "GR"));
+    }
+
     return lista;
   }
 

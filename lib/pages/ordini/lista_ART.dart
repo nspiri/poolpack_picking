@@ -288,6 +288,7 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
             isOF: widget.ordine.isOF,
             setLoading: setLoading,
             isUbicazione: false,
+            aggiornaLista: widget.ordine.aggiornaDocumenti,
           ),
           loading()
         ],

@@ -252,12 +252,13 @@ class ListaOCState extends State<ListaOC> {
                     listaDocumenti: documenti,
                     controlloOrdineCompleto: () {
                       articoli = [];
-                      getDocumenti(zonaSelezionata!.id!);
+                      //getDocumenti(zonaSelezionata!.id!);
                     },
                     setDocumento: (DocumentoOF d) {},
                     isOF: false,
                     setLoading: setLoading,
-                    isUbicazione: true),
+                    isUbicazione: true,
+                    aggiornaLista: aggiornaDocumenti),
               ),
             ),
           ],

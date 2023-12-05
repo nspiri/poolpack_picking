@@ -108,9 +108,9 @@ class ListaVenditeState extends State<ListaVendite> {
     widget.setLoading(true);
     setState(() {});
     http.evadiDocumenti(dati, context).then((value) {
-      widget.setLoading(false);
+      //widget.setLoading(false);
       if (value) {
-        showSuccessMessage(context, "Ordini cliente evasi");
+        showSuccessMessage(context, "Ordine cliente evaso");
       }
       widget.getDocumenti();
     });
@@ -135,6 +135,31 @@ class ListaVenditeState extends State<ListaVendite> {
       return true;
     }
     return false;
+  }
+
+  apriDialogEvadiDocumento(DocumentoOF doc) {
+    showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(
+            "Vuoi evadere il documento ${doc.documento} ${doc.serie}/${doc.numero}?"),
+        actions: [
+          TextButton(
+            child: const Text('No'),
+            onPressed: () {
+              Navigator.pop(c, false);
+            },
+          ),
+          TextButton(
+            child: const Text('Si'),
+            onPressed: () {
+              evadiOrdine(doc);
+              Navigator.pop(c, true);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -163,7 +188,7 @@ class ListaVenditeState extends State<ListaVendite> {
           child: InkWell(
             onLongPress: () {
               if (controlloOrdineCompletoa(documento)) {
-                //TODO chiedi evasione
+                apriDialogEvadiDocumento(documento);
               }
             },
             onTap: () {

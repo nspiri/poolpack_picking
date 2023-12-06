@@ -330,7 +330,7 @@ apriDialogOrdiniCompletati(BuildContext context) {
 }
 
 apriDialogAssociaAlias(BuildContext context, Articolo articolo,
-    Function(bool loading) setLoading) {
+    Function(bool loading) setLoading, Function() chiudiTastiera) {
   Http http = Http();
   TextEditingController codiceAlias = TextEditingController();
   TextEditingController q = TextEditingController();
@@ -384,6 +384,7 @@ apriDialogAssociaAlias(BuildContext context, Articolo articolo,
           child: const Text('Annulla'),
           onPressed: () {
             //isShowing = false;
+            chiudiTastiera();
             Navigator.pop(c, false);
           },
         ),
@@ -409,6 +410,7 @@ apriDialogAssociaAlias(BuildContext context, Articolo articolo,
 
               setLoading(false);
             });
+            chiudiTastiera();
             Navigator.pop(c, true);
           },
         ),
@@ -418,7 +420,7 @@ apriDialogAssociaAlias(BuildContext context, Articolo articolo,
 }
 
 apriDialogCreaEAN(BuildContext context, Articolo articolo,
-    Function(bool loading) setLoading) {
+    Function(bool loading) setLoading, Function() chiudiTastiera) {
   Http http = Http();
   showDialog<bool>(
     context: context,
@@ -428,6 +430,7 @@ apriDialogCreaEAN(BuildContext context, Articolo articolo,
         TextButton(
           child: const Text('No'),
           onPressed: () {
+            chiudiTastiera();
             Navigator.pop(c, false);
           },
         ),
@@ -437,6 +440,7 @@ apriDialogCreaEAN(BuildContext context, Articolo articolo,
             setLoading(true);
             http.creaEAN(articolo.codiceArticolo!, context).then((value) {
               setLoading(false);
+              chiudiTastiera();
             });
             Navigator.pop(c, true);
           },
@@ -447,7 +451,7 @@ apriDialogCreaEAN(BuildContext context, Articolo articolo,
 }
 
 apriDialogStampaEtichetta(BuildContext context, Articolo articolo,
-    Function(bool loading) setLoading) {
+    Function(bool loading) setLoading, Function() chiudiTastiera) {
   Http http = Http();
   showDialog<bool>(
     context: context,
@@ -458,6 +462,7 @@ apriDialogStampaEtichetta(BuildContext context, Articolo articolo,
         TextButton(
           child: const Text('No'),
           onPressed: () {
+            chiudiTastiera();
             Navigator.pop(c, false);
           },
         ),
@@ -469,6 +474,7 @@ apriDialogStampaEtichetta(BuildContext context, Articolo articolo,
                 .stampaEtichetta(articolo.codiceArticolo!, context)
                 .then((value) {
               setLoading(false);
+              chiudiTastiera();
             });
             Navigator.pop(c, true);
           },
@@ -507,7 +513,8 @@ apriDialogDatiBF(
     BuildContext context,
     Function(
             DocumentoOF documento, String dataDocumento, String numeroDocumento)
-        evadiOrdine) {
+        evadiOrdine,
+    Function() chiudiTastiera) {
   Http http = Http();
   TextEditingController numeroDocumento = TextEditingController();
   TextEditingController dataDocmento = TextEditingController();
@@ -611,6 +618,7 @@ apriDialogDatiBF(
     if (val == true) {
       evadiOrdine(documento, dataDocmento.text, numeroDocumento.text);
     }
+    chiudiTastiera();
   });
 }
 

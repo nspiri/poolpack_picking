@@ -1,6 +1,9 @@
 // ignore_for_file: file_names
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:poolpack_picking/Model/magazzino.dart';
 import 'package:poolpack_picking/pages/articolo/anagrafica_articolo.dart';
 import 'package:poolpack_picking/pages/ordini/componenti/indicatore_ordine.dart';
@@ -8,6 +11,7 @@ import 'package:poolpack_picking/utils/global.dart';
 import 'package:poolpack_picking/utils/http.dart';
 import 'package:poolpack_picking/Model/ordini_fornitori.dart';
 import 'package:poolpack_picking/utils/utils.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class ListaArticoli extends StatefulWidget {
   final List<Articolo>? articoli;
@@ -46,8 +50,25 @@ class ListaArticoliState extends State<ListaArticoli> {
   final _scrollController = ScrollController();
   List<Articolo> articoliFiltrati = [];
   String coloreFiltro = "";
+  late StreamSubscription<bool> keyboardSubscription;
+  bool chiusa = false;
+
+  @override
+  void initState() {
+    super.initState();
+    var keyboardVisibilityController = KeyboardVisibilityController();
+    keyboardSubscription =
+        keyboardVisibilityController.onChange.listen((bool visible) {
+      if (!chiusa) {
+        chiusa = true;
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
+      }
+      setState(() {});
+    });
+  }
 
   refresh() {
+    chiusa = false;
     if (!widget.isOF) {
       widget.controlloOrdineCompleto();
     }
@@ -85,6 +106,9 @@ class ListaArticoliState extends State<ListaArticoli> {
     } else {
       apriConfermaArticoloSospeso(articolo, index);
     }
+    chiusa = false;
+    setState(() {});
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   apriConfermaArticoloSospeso(Articolo articolo, int index) {
@@ -116,6 +140,12 @@ class ListaArticoliState extends State<ListaArticoli> {
       ),
     );
     return true;
+  }
+
+  chiudiTastiera() {
+    chiusa = false;
+    setState(() {});
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   DocumentoOF? cercaDocumento(Articolo articolo) {
@@ -354,6 +384,7 @@ class ListaArticoliState extends State<ListaArticoli> {
                   } else {
                     showErrorMessage(context, "Codice articolo non trovato");
                   }
+                  chiudiTastiera();
                   codiceArticolo.text = "";
                   setState(() {});
                 });

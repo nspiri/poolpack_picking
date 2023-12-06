@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:poolpack_picking/Model/magazzino.dart';
@@ -5,6 +7,7 @@ import 'package:poolpack_picking/Model/ordini_fornitori.dart';
 import 'package:poolpack_picking/utils/global.dart';
 import 'package:poolpack_picking/utils/http.dart';
 import 'package:poolpack_picking/utils/utils.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class PickingPage extends StatefulWidget {
   final Articolo articolo;
@@ -44,7 +47,6 @@ class PickingPageState extends State<PickingPage> {
   late String modalita;
   bool isLoading = false;
   Http http = Http();
-
   TextEditingController codiceArticolo = TextEditingController();
   TextEditingController colli = TextEditingController();
   TextEditingController qta = TextEditingController();
@@ -53,6 +55,8 @@ class PickingPageState extends State<PickingPage> {
   bool isEnabled = false;
   bool isQtaEnabled = false;
   TextInputType tastiera = TextInputType.none;
+  late StreamSubscription<bool> keyboardSubscription;
+  bool chiusa = false;
 
   @override
   void initState() {
@@ -70,6 +74,16 @@ class PickingPageState extends State<PickingPage> {
         }
       }
     });
+
+    var keyboardVisibilityController = KeyboardVisibilityController();
+    keyboardSubscription =
+        keyboardVisibilityController.onChange.listen((bool visible) {
+      if (!chiusa) {
+        chiusa = true;
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
+      }
+      setState(() {});
+    });
   }
 
   refresh() {
@@ -86,6 +100,7 @@ class PickingPageState extends State<PickingPage> {
     setCampiCambio(articolo);
     _focusNode.requestFocus();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
+    chiusa = false;
     setState(() {});
   }
 
@@ -133,7 +148,7 @@ class PickingPageState extends State<PickingPage> {
       }
     }
     _focusNode.requestFocus();
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    chiusa = false;
     setState(() {});
   }
 
@@ -282,6 +297,10 @@ class PickingPageState extends State<PickingPage> {
         colli.text = articolo.colli.toString();
       }
     }
+    _focusNode.unfocus();
+    chiusa = false;
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+    setState(() {});
   }
 
   controlloArticolo(Articolo? art) {
@@ -289,13 +308,19 @@ class PickingPageState extends State<PickingPage> {
     do {
       if (art == null) {
         showErrorMessage(context, "Articolo non trovato");
+        chiusa = false;
         _focusNode.requestFocus();
+        setState(() {});
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
         isValid = false;
         break;
       }
       if (articolo.codiceArticolo != art.codiceArticolo) {
         showErrorMessage(context, "Articolo errato");
+        chiusa = false;
         _focusNode.requestFocus();
+        setState(() {});
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
         isValid = false;
         break;
       }
@@ -305,7 +330,10 @@ class PickingPageState extends State<PickingPage> {
             if (art.alias!.quantita! > 0) {
               if (articolo.quantita != art.alias!.quantita) {
                 showErrorMessage(context, "Quantità non corrispondente");
+                chiusa = false;
                 _focusNode.requestFocus();
+                setState(() {});
+                SystemChannels.textInput.invokeMethod('TextInput.hide');
                 isValid = false;
                 break;
               }
@@ -315,7 +343,10 @@ class PickingPageState extends State<PickingPage> {
         if (articolo.prgTaglia != 0) {
           if (articolo.prgTaglia != art.prgTaglia) {
             showErrorMessage(context, "Taglia non corrispondente");
+            chiusa = false;
             _focusNode.requestFocus();
+            setState(() {});
+            SystemChannels.textInput.invokeMethod('TextInput.hide');
             isValid = false;
             break;
           }

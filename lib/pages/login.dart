@@ -30,7 +30,7 @@ class LoginDemoState extends State<Login> {
   List<String> utenti = [];
   String? utenteSelezionato;
   OtaEvent? currentEvent;
-  String currentVersion = "2023120402";
+  String currentVersion = "2023120501";
 
   @override
   void initState() {

@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:poolpack_picking/Model/magazzino.dart';
 import 'package:poolpack_picking/Model/ordini_fornitori.dart';
 import 'package:poolpack_picking/pages/articolo/anagrafica_articolo.dart';
@@ -25,11 +29,25 @@ class ListaArticoliGState extends State<ListaArticoliG>
   List<Articolo> articoli = [];
   String codiceSelezionato = "";
   FocusNode focus = FocusNode();
+  late StreamSubscription<bool> keyboardSubscription;
+  bool chiusa = false;
 
   @override
   void initState() {
     super.initState();
     isCercaArticolo = widget.isCercaArticolo;
+    setFocus();
+    var keyboardVisibilityController = KeyboardVisibilityController();
+    keyboardSubscription =
+        keyboardVisibilityController.onChange.listen((bool visible) {
+      if (!chiusa) {
+        if (visible) {
+          chiusa = true;
+          SystemChannels.textInput.invokeMethod('TextInput.hide');
+        }
+      }
+      setState(() {});
+    });
   }
 
   @override
@@ -60,7 +78,9 @@ class ListaArticoliGState extends State<ListaArticoliG>
   }
 
   setFocus() {
+    chiusa = false;
     focus.requestFocus();
+    setState(() {});
   }
 
   int? cercaIdUbicazione(String ubicazione) {
@@ -100,6 +120,7 @@ class ListaArticoliGState extends State<ListaArticoliG>
   }
 
   aggiornaArticoli() {
+    setFocus();
     isLoading = true;
     setState(() {});
     if (isCercaArticolo) {
@@ -107,6 +128,7 @@ class ListaArticoliGState extends State<ListaArticoliG>
         isLoading = false;
         articoli = value;
         codice.text = "";
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
         setState(() {});
       });
     } else {
@@ -116,12 +138,15 @@ class ListaArticoliGState extends State<ListaArticoliG>
         isLoading = false;
         articoli = value;
         codice.text = "";
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
         setState(() {});
       });
     }
   }
 
   void apriListaUbicazioni() {
+    chiusa = false;
+    setState(() {});
     Navigator.of(context)
         .push(FullScreenSearchModal(
             ubicazioneSel: null, ubicazionePredefinita: null))
@@ -138,13 +163,17 @@ class ListaArticoliGState extends State<ListaArticoliG>
           codiceSelezionato = value.codice!;
           //codice.text = "";
           controlloArticoli(articoli);
-          setState(() {});
         });
       }
+      chiusa = false;
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+      setState(() {});
     });
   }
 
   void apriListaArticoli() {
+    chiusa = false;
+    setState(() {});
     Navigator.of(context).push(FullScreenSearchModalArticoli()).then((value) {
       if (value != null) {
         isLoading = true;
@@ -155,10 +184,13 @@ class ListaArticoliGState extends State<ListaArticoliG>
           isLoading = false;
           articoli = val;
           codice.text = "";
+          chiusa = false;
           controlloArticoli(articoli);
-          setState(() {});
         });
       }
+      chiusa = false;
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+      setState(() {});
     });
   }
 
@@ -178,6 +210,10 @@ class ListaArticoliGState extends State<ListaArticoliG>
                       child: TextField(
                         controller: codice,
                         focusNode: focus,
+                        onTap: () {
+                          chiusa = true;
+                          setState(() {});
+                        },
                         style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black,
@@ -196,6 +232,9 @@ class ListaArticoliGState extends State<ListaArticoliG>
                               articoli = value;
                               codiceSelezionato = codice.text;
                               codice.text = "";
+                              setFocus();
+                              SystemChannels.textInput
+                                  .invokeMethod('TextInput.hide');
                               controlloArticoli(articoli);
                               setState(() {});
                             });
@@ -208,6 +247,9 @@ class ListaArticoliGState extends State<ListaArticoliG>
                               articoli = value;
                               codiceSelezionato = codice.text;
                               codice.text = "";
+                              setFocus();
+                              SystemChannels.textInput
+                                  .invokeMethod('TextInput.hide');
                               controlloArticoli(articoli);
                               setState(() {});
                             });

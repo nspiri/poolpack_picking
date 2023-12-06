@@ -141,7 +141,7 @@ class ListaOFState extends State<ListaOrdiniFornitore> {
           child: InkWell(
             onLongPress: () {
               if (utils.controlloOrdineCompleto(documento)) {
-                utils.apriDialogDatiBF(documento, context, evadiOrdine);
+                utils.apriDialogDatiBF(documento, context, evadiOrdine, () {});
               } else {
                 utils.showErrorMessage(
                     context, "Completa l'ordine prima di poterlo inviare");

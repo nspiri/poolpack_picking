@@ -1,7 +1,10 @@
 // ignore_for_file: unrelated_type_equality_checks
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:poolpack_picking/Model/magazzino.dart';
 import 'package:poolpack_picking/Model/ordini_fornitori.dart';
 import 'package:poolpack_picking/pages/articolo/lista_ubicazioni_modal.dart';
@@ -34,6 +37,8 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
   bool isTrasferisci = true;
   GlobalKey<UbicazioniPageState> globalKey = GlobalKey();
   GlobalKey<PickingPageState> globalKeyPicking = GlobalKey();
+  late StreamSubscription<bool> keyboardSubscription;
+  bool chiusa = false;
 
   @override
   void initState() {
@@ -63,6 +68,15 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
       menu.add(const PopupMenuItem<int>(
           value: 4, child: Text('Modifica ubicazione')));
     }*/
+    var keyboardVisibilityController = KeyboardVisibilityController();
+    keyboardSubscription =
+        keyboardVisibilityController.onChange.listen((bool visible) {
+      if (!chiusa) {
+        chiusa = true;
+        SystemChannels.textInput.invokeMethod('TextInput.hide');
+      }
+      setState(() {});
+    });
   }
 
   DocumentoOF? cercaDocumento() {
@@ -171,6 +185,9 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
       if (value != null) {
         apriDialogConfermaAssociaUbicazione(articolo, value);
       }
+      chiusa = false;
+      setState(() {});
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
     });
   }
 
@@ -235,25 +252,54 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
           }
         });
       }
+      chiusa = false;
+      setState(() {});
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
     });
   }
 
   Future<void> handleClick(int value) async {
     switch (value) {
       case 0:
-        apriDialogCreaEAN(context, articolo, setLoading);
+        apriDialogCreaEAN(
+          context,
+          articolo,
+          setLoading,
+          () {
+            chiusa = false;
+            setState(() {});
+            SystemChannels.textInput.invokeMethod('TextInput.hide');
+          },
+        );
         break;
       case 1:
+        chiusa = false;
+        setState(() {});
         _showModal(context);
         break;
       case 2:
-        apriDialogAssociaAlias(context, articolo, setLoading);
+        chiusa = false;
+        setState(() {});
+        apriDialogAssociaAlias(
+          context,
+          articolo,
+          setLoading,
+          () {
+            chiusa = false;
+            setState(() {});
+            SystemChannels.textInput.invokeMethod('TextInput.hide');
+          },
+        );
         break;
       case 3:
         chiediConfermaResiduoSospeso(articolo, index);
         break;
       case 4:
-        apriDialogStampaEtichetta(context, articolo, setLoading);
+        apriDialogStampaEtichetta(context, articolo, setLoading, () {
+          chiusa = false;
+          setState(() {});
+          SystemChannels.textInput.invokeMethod('TextInput.hide');
+        });
         break;
       case 5:
         isTrasferisci = false;
@@ -412,6 +458,9 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
           TextButton(
             child: const Text('No'),
             onPressed: () {
+              chiusa = false;
+              setState(() {});
+              SystemChannels.textInput.invokeMethod('TextInput.hide');
               Navigator.pop(c, false);
             },
           ),
@@ -425,7 +474,9 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
               } else {
                 setPicking(articolo, 0, "0", "#", index);
               }*/
-
+              chiusa = false;
+              setState(() {});
+              SystemChannels.textInput.invokeMethod('TextInput.hide');
               Navigator.pop(c, false);
             },
           ),

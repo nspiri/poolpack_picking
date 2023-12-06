@@ -15,7 +15,7 @@ import '../Model/login_data.dart';
 import '../env.dart' as env;
 
 class Http {
-  Duration get loginTime => const Duration(seconds: 60);
+  Duration get loginTime => const Duration(seconds: 120);
 
   Future<List<String>> getUtenti(BuildContext context) async {
     try {

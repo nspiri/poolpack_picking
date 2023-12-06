@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:poolpack_picking/Model/ordini_fornitori.dart';
 import 'package:poolpack_picking/pages/home.dart';
 import 'package:poolpack_picking/pages/login.dart';
-import 'package:poolpack_picking/pages/ordini/componenti/lista_articoli.dart';
+import 'package:poolpack_picking/pages/ordini/componenti/lista_articoli.dart'
+    as lista;
 import 'package:poolpack_picking/utils/http.dart';
 import 'package:poolpack_picking/utils/global.dart';
 import 'package:poolpack_picking/utils/utils.dart';
@@ -24,7 +26,7 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
   Http http = Http();
   final List<bool> ordineUbicazioneSelezionato = <bool>[true, false];
   bool visualizzaListaOrdini = false;
-
+  GlobalKey<lista.ListaArticoliState> globalKey = GlobalKey();
   bool isShowing = false;
 
   @override
@@ -260,7 +262,14 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
                           context, "Ordine con quantità da confermare");
                       break;
                     case "Y":
-                      apriDialogDatiBF(ordine, context, evadiOrdine);
+                      apriDialogDatiBF(
+                        ordine,
+                        context,
+                        evadiOrdine,
+                        () {
+                          globalKey.currentState?.chiudiTastiera();
+                        },
+                      );
                       break;
                   }
                 },
@@ -270,7 +279,8 @@ class ListaArticoliState extends State<PaginaListaArticoli> {
       ),
       body: Stack(
         children: [
-          ListaArticoli(
+          lista.ListaArticoli(
+            key: globalKey,
             articoli: ordine.articoli,
             visualizzaDatiOrdine: false,
             documento: widget.ordine.ordine,

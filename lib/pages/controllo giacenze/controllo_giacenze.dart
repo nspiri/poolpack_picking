@@ -21,40 +21,44 @@ class ControlloGiacenzeState extends State<ControlloGiacenze>
     super.initState();
     controller = TabController(vsync: this, length: 2);
     controller.addListener(() {
-      globalKey.currentState?.setFocus();
-      globalKey2.currentState?.setFocus();
+      if (controller.index == 0) {
+        globalKey.currentState?.setFocus();
+      } else {
+        globalKey2.currentState?.setFocus();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
+    return /*DefaultTabController(
       length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Controllo giacenze"),
-          bottom: TabBar(
-            // controller: controller,
-            tabs: const [
-              Tab(
-                text: "Articolo",
-              ),
-              Tab(
-                text: "Ubicazione",
-              ),
-            ],
-            indicatorColor: Theme.of(context).primaryColorDark,
-            labelColor: Colors.white,
-          ),
-        ),
-        body: TabBarView(
-          // controller: controller,
-          children: [
-            ListaArticoliG(isCercaArticolo: true, key: globalKey),
-            ListaArticoliG(isCercaArticolo: false, key: globalKey2)
+      child: */
+        Scaffold(
+      appBar: AppBar(
+        title: const Text("Controllo giacenze"),
+        bottom: TabBar(
+          controller: controller,
+          tabs: const [
+            Tab(
+              text: "Articolo",
+            ),
+            Tab(
+              text: "Ubicazione",
+            ),
           ],
+          indicatorColor: Theme.of(context).primaryColorDark,
+          labelColor: Colors.white,
         ),
       ),
+      body: TabBarView(
+        controller: controller,
+        children: [
+          ListaArticoliG(isCercaArticolo: true, key: globalKey),
+          ListaArticoliG(isCercaArticolo: false, key: globalKey2)
+        ],
+      ),
+      // ),
     );
   }
 

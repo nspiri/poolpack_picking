@@ -67,7 +67,10 @@ class ListaArticoliGState extends State<ListaArticoliG>
                   listaArticoli: articoli,
                   articoloPicking: null,
                   isUbicazione: false,
-                  aggiornaDocumenti: null))
+                  aggiornaDocumenti: null,
+                  idUbicazione: !isCercaArticolo
+                      ? cercaUbicazionePerCodice(codiceSelezionato)?.id
+                      : null))
           .then((value) {
         aggiornaArticoli();
       });
@@ -318,7 +321,10 @@ class ListaArticoliGState extends State<ListaArticoliG>
                         listaArticoli: articoli,
                         articoloPicking: null,
                         isUbicazione: false,
-                        aggiornaDocumenti: null))
+                        aggiornaDocumenti: null,
+                        idUbicazione: isCercaArticolo
+                            ? null
+                            : cercaUbicazionePerCodice(codiceSelezionato)?.id))
                 .then((value) {
               aggiornaArticoli();
             });

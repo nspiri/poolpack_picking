@@ -14,6 +14,7 @@ class UbicazioniPage extends StatefulWidget {
   final bool isTrasferisci;
   final PassaggioDatiArticolo dati;
   final Function(bool value) setLoading;
+  final int? idUbicazione;
   //final Function(DocumentoOF documento) tornaIndietro;
   const UbicazioniPage(
       {super.key,
@@ -21,7 +22,8 @@ class UbicazioniPage extends StatefulWidget {
       required this.articolo,
       required this.isTrasferisci,
       required this.dati,
-      required this.setLoading});
+      required this.setLoading,
+      required this.idUbicazione});
 
   @override
   UbicazioniPageState createState() => UbicazioniPageState();
@@ -48,6 +50,15 @@ class UbicazioniPageState extends State<UbicazioniPage> {
     for (int c = 0; c < esistenze.length; c++) {
       if (esistenze[c].ubicazionePredefinita!) {
         if (c > 0) {
+          var esistenzaTemp = esistenze[c];
+          esistenze.remove(esistenze[c]);
+          esistenze.insert(0, esistenzaTemp);
+        }
+      }
+    }
+    for (int c = 0; c < esistenze.length; c++) {
+      if (widget.idUbicazione != null) {
+        if (esistenze[c].idUbicazione == widget.idUbicazione) {
           var esistenzaTemp = esistenze[c];
           esistenze.remove(esistenze[c]);
           esistenze.insert(0, esistenzaTemp);
@@ -294,10 +305,12 @@ class UbicazioniPageState extends State<UbicazioniPage> {
             borderRadius: BorderRadius.circular(10),
             side: BorderSide(
                 color: esistenza.idUbicazione == 0
-                    ? Colors.yellow.shade700
+                    ? Colors.grey
                     : esistenza.ubicazionePredefinita!
                         ? Colors.green
-                        : Theme.of(context).primaryColorDark,
+                        : esistenza.idUbicazione == widget.idUbicazione
+                            ? Colors.orange.shade700
+                            : Theme.of(context).primaryColorDark,
                 width: 2)),
         child: InkWell(
           onTap: () {
@@ -336,10 +349,12 @@ class UbicazioniPageState extends State<UbicazioniPage> {
                       leading: Icon(
                         Icons.warehouse,
                         color: esistenza.idUbicazione == 0
-                            ? Colors.yellow.shade700
+                            ? Colors.grey
                             : esistenza.ubicazionePredefinita!
                                 ? Colors.green
-                                : Theme.of(context).primaryColorDark,
+                                : esistenza.idUbicazione == widget.idUbicazione
+                                    ? Colors.orange.shade700
+                                    : Theme.of(context).primaryColorDark,
                         size: 40,
                       ),
                       title: Text(
@@ -370,12 +385,16 @@ class UbicazioniPageState extends State<UbicazioniPage> {
                                     const Size.fromHeight(50)),
                                 backgroundColor:
                                     MaterialStateProperty.all<Color>(
-                                        esistenza.idUbicazione == 0
-                                            ? Colors.yellow.shade700
-                                            : esistenza.ubicazionePredefinita!
-                                                ? Colors.green
-                                                : Theme.of(context)
-                                                    .primaryColorDark),
+                                  esistenza.idUbicazione == 0
+                                      ? Colors.grey
+                                      : esistenza.ubicazionePredefinita!
+                                          ? Colors.green
+                                          : esistenza.idUbicazione ==
+                                                  widget.idUbicazione
+                                              ? Colors.orange.shade700
+                                              : Theme.of(context)
+                                                  .primaryColorDark,
+                                ),
                                 shape: MaterialStateProperty.all<
                                         RoundedRectangleBorder>(
                                     const RoundedRectangleBorder(

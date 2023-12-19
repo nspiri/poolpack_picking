@@ -165,6 +165,7 @@ class PickingPageState extends State<PickingPage> {
         numero: documento?.numero,
         rigo: articolo.rigo,
         prgTaglia: articolo.prgTaglia,
+        codiceArticolo: articolo.codiceArticolo,
         colli: int.parse(colli.text),
         quantita:
             articolo.colli == 0 ? double.parse(qta.text) : articolo.quantita,

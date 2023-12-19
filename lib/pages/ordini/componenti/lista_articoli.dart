@@ -182,6 +182,7 @@ class ListaArticoliState extends State<ListaArticoli> {
         rigo: articolo.rigo,
         prgTaglia: articolo.prgTaglia,
         colli: colli,
+        codiceArticolo: articolo.codiceArticolo,
         quantita: articolo.colli == 0
             ? double.parse(quantita == "" ? "0" : quantita!)
             : articolo.quantita,
@@ -282,7 +283,8 @@ class ListaArticoliState extends State<ListaArticoli> {
                                           articoloPicking: value[0],
                                           isUbicazione: false,
                                           aggiornaDocumenti:
-                                              widget.aggiornaLista))
+                                              widget.aggiornaLista,
+                                          idUbicazione: null))
                                   .then((value) => refresh());
                             }
                           }
@@ -341,7 +343,8 @@ class ListaArticoliState extends State<ListaArticoli> {
                                               articoloPicking: value[0],
                                               isUbicazione: false,
                                               aggiornaDocumenti:
-                                                  widget.aggiornaLista))
+                                                  widget.aggiornaLista,
+                                              idUbicazione: null))
                                       .then((value) => refresh());
                                 }
                               } else {
@@ -366,7 +369,8 @@ class ListaArticoliState extends State<ListaArticoli> {
                                             articoloPicking: value[0],
                                             isUbicazione: false,
                                             aggiornaDocumenti:
-                                                widget.aggiornaLista))
+                                                widget.aggiornaLista,
+                                            idUbicazione: null))
                                     .then((value) => refresh());
                               }
                             }
@@ -463,7 +467,8 @@ class ListaArticoliState extends State<ListaArticoli> {
                             : widget.articoli!,
                         articoloPicking: null,
                         isUbicazione: widget.isUbicazione,
-                        aggiornaDocumenti: widget.aggiornaLista))
+                        aggiornaDocumenti: widget.aggiornaLista,
+                        idUbicazione: null))
                 .then((value) => refresh());
           },
           onLongPress: () {

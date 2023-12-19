@@ -37,9 +37,12 @@ class ListaOFState extends State<ListaOF> {
       isLoading = false;
       documenti = value;
       documenti.sort((a, b) {
-        return DateFormat("yyyy-MM-dd")
-            .parse(a.scadenza!)
-            .compareTo(DateFormat("yyyy-MM-dd").parse(b.scadenza!));
+        int fornitore = b.intestatario!.compareTo(a.intestatario!);
+        int numero = b.numero!.compareTo(a.numero!);
+        if (fornitore == 0) {
+          return -numero;
+        }
+        return -fornitore;
       });
       setState(() {});
     });

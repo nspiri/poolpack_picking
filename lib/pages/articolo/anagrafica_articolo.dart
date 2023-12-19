@@ -61,8 +61,10 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
           const PopupMenuItem<int>(value: 8, child: Text('Conferma articolo')));
     }
     if (modalita == "CG") {
-      menu.add(const PopupMenuItem<int>(
-          value: 5, child: Text('Rettifica esistenza')));
+      if (g.utente_selezionato!.rettifica == true) {
+        menu.add(const PopupMenuItem<int>(
+            value: 5, child: Text('Rettifica esistenza')));
+      }
     }
     /* if (modalita == "CG") {
       menu.add(const PopupMenuItem<int>(
@@ -580,6 +582,7 @@ class AnagraficaArticoloState extends State<AnagraficaArticolo> {
                   isTrasferisci: isTrasferisci,
                   dati: widget.dati,
                   setLoading: setLoading,
+                  idUbicazione: widget.dati.idUbicazione,
                 ),
                 const SizedBox(
                   height: 10,
